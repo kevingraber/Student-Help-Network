@@ -1,0 +1,20 @@
+{
+  "name": "Student-Help-Network",
+  "homepage": "https://github.com/kevingraber/Student-Help-Network",
+  "authors": [
+    "kg <kjg310@gmail.com>"
+  ],
+  "description": "App to automatically match students with mentors.",
+  "main": "server.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}

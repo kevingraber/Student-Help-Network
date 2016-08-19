@@ -10,5 +10,10 @@
 // =============================================================
 module.exports = function(app){
 
+	app.post('/student-signup',
+	function(req, res){
+		console.log(req.body)
+		res.send("Thanks for signing up!")
+	});
 
 }

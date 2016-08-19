@@ -16,125 +16,142 @@
 	<div class="row">
 		<div class="col-md-12">
 
-			<form class="form-horizontal">
+			<form class="form-horizontal" action="/student-signup" method="POST">
 
 				<div class="form-group">
-					<label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+					<label for="name" class="col-sm-2 control-label">Name</label>
 					<div class="col-sm-10">
-						<input type="email" class="form-control" id="inputEmail3" placeholder="Email">
+						<input class="form-control" name="name" id="name" placeholder="Name" required>
 					</div>
 			  	</div>
 
 			  	<div class="form-group">
-					<label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+					<label for="email" class="col-sm-2 control-label">Email</label>
 					<div class="col-sm-10">
-						<input type="email" class="form-control" id="inputEmail3" placeholder="Email">
+						<input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
 					</div>
 			  	</div>
 				
 				<div class="form-group">
-					<label for="inputPassword3" class="col-sm-2 control-label">Section</label>
+					<label for="section" class="col-sm-2 control-label">Section</label>
 					<div class="col-sm-10">
-						<select class="form-control">
-						  	<option>1</option>
-						  	<option>2</option>
-						  	<option>3</option>
-						  	<option>4</option>
-						  	<option>5</option>
+						<select class="form-control" name="section">
+						  	<option value="1">1</option>
+						  	<option value="2">2</option>
+						  	<option value="3">3</option>
+						  	<option value="4">4</option>
+						  	<option value="5">5</option>
 						</select>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label for="inputPassword3" class="col-sm-2 control-label">How comfortable are you with material in class?</label>
+					<label for="comfortLevel" class="col-sm-2 control-label">How comfortable are you with material in class?</label>
 					<div class="col-sm-10">
-						<select class="form-control">
-						  	<option>1</option>
-						  	<option>2</option>
-						  	<option>3</option>
-						  	<option>4</option>
-						  	<option>5</option>
+						<select class="form-control" name="comfortLevel">
+						  	<option value="1">1</option>
+						  	<option value="2">2</option>
+						  	<option value="3">3</option>
+						  	<option value="4">4</option>
+						  	<option value="5">5</option>
 						</select>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label for="inputPassword3" class="col-sm-2 control-label">What do you want to cover?</label>
+					<label for="subjects" class="col-sm-2 control-label">What do you want to cover?</label>
 					<div class="col-sm-10">
 						<div class="checkbox">
 						  	<label>
-						    	<input type="checkbox" value="">
+						    	<input type="checkbox" value="peptalk-advice" name="subjects">
 						    	Pep-Talk & Advice
 						  	</label>
 						</div>
 						<div class="checkbox">
 						  	<label>
-						    	<input type="checkbox" value="">
+						    	<input type="checkbox" value="htmlcss" name="subjects">
 						    	HTML Layouts (HTML, CSS)
 						  	</label>
 						</div>
 						<div class="checkbox">
 						  	<label>
-						    	<input type="checkbox" value="">
+						    	<input type="checkbox" value="bootstrap" name="subjects">
 						    	Bootstrap Layouts
 						  	</label>
 						</div>
 						<div class="checkbox">
 						  	<label>
-						    	<input type="checkbox" value="">
+						    	<input type="checkbox" value="javascript" name="subjects">
 						    	JavaScript Fundamentals (Hangman, etc.)
 						  	</label>
 						</div>
 						<div class="checkbox">
 						  	<label>
-						    	<input type="checkbox" value="">
+						    	<input type="checkbox" value="node" name="subjects">
 						    	Node.js
 						  	</label>
 						</div>
 						<div class="checkbox">
 						  	<label>
-						    	<input type="checkbox" value="">
+						    	<input type="checkbox" value="jquery" name="subjects">
 						    	jQuery HTML Manipulation
 						  	</label>
 						</div>
 						<div class="checkbox">
 						  	<label>
-						    	<input type="checkbox" value="">
+						    	<input type="checkbox" value="ajax" name="subjects">
 						    	JavaScript AJAX
 						  	</label>
 						</div>
 						<div class="checkbox">
 						  	<label>
-						    	<input type="checkbox" value="">
+						    	<input type="checkbox" value="firebase" name="subjects">
 						    	Firebase
 						  	</label>
 						</div>
 						<div class="checkbox">
 						  	<label>
-						    	<input type="checkbox" value="">
+						    	<input type="checkbox" value="mysql" name="subjects">
 						    	Database (MySQL)
 						  	</label>
 						</div>
 					</div>
 				</div>
 
-				<div class="form-group">
-					<label for="inputPassword3" class="col-sm-2 control-label">When are you available?</label>
+<!-- 				<div class="form-group">
+					<label for="subject" class="col-sm-2 control-label">What do you want help with?</label>
 					<div class="col-sm-10">
-						<select class="form-control">
-						  	<option>1</option>
-						  	<option>2</option>
-						  	<option>3</option>
-						  	<option>4</option>
-						  	<option>5</option>
+						<select class="form-control" name="availability">
+						  	<option value="peptalk-advice">Pep-Talk & Advice</option>
+						  	<option value="htmlcss">HTML Layouts (HTML, CSS)</option>
+						  	<option value="bootstrap">Bootstrap Layouts</option>
+						  	<option value="javascript">JavaScript Fundamentals (Hangman, etc.)</option>
+						  	<option value="node">Node.js</option>
+						  	<option value="jquery">jQuery HTML Manipulation</option>
+						  	<option value="ajax">JavaScript AJAX</option>
+						  	<option value="firebase">Firebase</option>
+						  	<option value="mysql">Database (MySQL)</option>
+						</select>
+					</div>
+				</div> -->
+
+				<div class="form-group">
+					<label for="availability" class="col-sm-2 control-label">When are you available?</label>
+					<div class="col-sm-10">
+						<select class="form-control" name="availability">
+						  	<option value="1">1</option>
+						  	<option value="2">2</option>
+						  	<option value="3">3</option>
+						  	<option value="4">4</option>
+						  	<option value="5">5</option>
 						</select>
 					</div>
 				</div>
 
 			  	<div class="form-group">
-					<label for="inputPassword3" class="col-sm-2 control-label">Any thing else?</label>
+					<label for="extrainfo" class="col-sm-2 control-label">Any thing else?</label>
 					<div class="col-sm-10">
-				  		<textarea class="form-control" rows="3"></textarea>
+				  		<textarea class="form-control" rows="3" name="extrainfo"></textarea>
 					</div>
 			  	</div>
 

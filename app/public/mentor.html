@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Student Sign Up</title>
+	<title>Mentor Sign Up</title>
 	<link rel="stylesheet" type="text/css" href="../bower_components/bootstrap/dist/css/bootstrap.css">
 	<script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
 	<script type="text/javascript" src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
@@ -9,14 +9,14 @@
 <body>
 
 <div class="jumbotron text-center">
-	<h1>Student Sign Up - SUPERBASIC</h1>
+	<h1>Mentor Sign Up - SUPERBASIC</h1>
 </div>
 
 <div class="container">
 	<div class="row">
 		<div class="col-md-12">
 
-			<form class="form-horizontal" action="/student-signup" method="POST">
+			<form class="form-horizontal" action="/mentor-signup" method="POST">
 
 				<div class="form-group">
 					<label for="name" class="col-sm-2 control-label">Name</label>
@@ -58,8 +58,8 @@
 					</div>
 				</div>
 
-<!-- 				<div class="form-group">
-					<label for="subjects" class="col-sm-2 control-label">What do you want to cover?</label>
+				<div class="form-group">
+					<label for="subjects" class="col-sm-2 control-label">What do you want to offer help with?</label>
 					<div class="col-sm-10">
 						<div class="checkbox">
 						  	<label>
@@ -116,12 +116,23 @@
 						  	</label>
 						</div>
 					</div>
-				</div> -->
+				</div>
 
 				<div class="form-group">
-					<label for="subjects" class="col-sm-2 control-label">What do you want help with?</label>
+					<label for="numCanMentor" class="col-sm-2 control-label">How many students can you mentor?</label>
 					<div class="col-sm-10">
-						<select class="form-control" name="subjects">
+						<select class="form-control" name="numCanMentor">
+						  	<option value="1">1</option>
+						  	<option value="2">2</option>
+						  	<option value="3">3</option>
+						</select>
+					</div>
+				</div>
+
+<!-- 				<div class="form-group">
+					<label for="subject" class="col-sm-2 control-label">What do you want help with?</label>
+					<div class="col-sm-10">
+						<select class="form-control" name="availability">
 						  	<option value="peptalk-advice">Pep-Talk & Advice</option>
 						  	<option value="htmlcss">HTML Layouts (HTML, CSS)</option>
 						  	<option value="bootstrap">Bootstrap Layouts</option>
@@ -133,7 +144,7 @@
 						  	<option value="mysql">Database (MySQL)</option>
 						</select>
 					</div>
-				</div>
+				</div> -->
 
 				<div class="form-group">
 					<label for="availability" class="col-sm-2 control-label">When are you available?</label>
@@ -147,13 +158,6 @@
 						</select>
 					</div>
 				</div>
-
-			  	<div class="form-group">
-					<label for="extrainfo" class="col-sm-2 control-label">Any thing else?</label>
-					<div class="col-sm-10">
-				  		<textarea class="form-control" rows="3" name="additionalinfo"></textarea>
-					</div>
-			  	</div>
 
 			  	<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">

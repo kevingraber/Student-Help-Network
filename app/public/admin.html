@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Admin Test</title>
+	<link rel="stylesheet" type="text/css" href="../bower_components/bootstrap/dist/css/bootstrap.css">
+	<script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+</head>
+<body>
+
+<div class="jumbotron text-center">
+	<h1>Admin - TEST</h1>
+</div>
+
+<div class ="container">
+	<div id="data">
+		
+	</div>
+</div>
+
+<script>
+		var originURL = document.location.origin;     
+	 	$.ajax({url: originURL + '/api/student-list', method: 'GET'}).done(function(response) {
+	 		console.log(response)
+	 		console.log(response.length)
+	 		for (var i = 0; i < response.length; i++){
+	 			var para = $("<p>")
+	 			para.text(response[i].name)
+	 			$("#data").append(para)
+		 	};
+	 	})
+</script>
+
+</body>
+</html>

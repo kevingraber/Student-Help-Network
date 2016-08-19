@@ -8,12 +8,16 @@ var express 	= require('express');
 var bodyParser 	= require('body-parser');
 var morgan = require('morgan');
 var path = require('path');
+var mongoose = require('mongoose');
 
 
 // Sets up the Express App
 // =============================================================
 var app = express();
 var PORT = process.env.PORT || 8080;
+
+// Sets the connection to MongoDB
+mongoose.connect("mongodb://localhost/Student-Help-App-DB");
 
 // Use morgan to log requests to the console.
 app.use(morgan('dev'));

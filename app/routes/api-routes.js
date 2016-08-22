@@ -7,6 +7,7 @@
 var mongoose = require('mongoose');
 var Student = require('../model/student.js');
 var Mentor = require('../model/mentor.js');
+var _ = require('lodash');
 
 
 // Routes
@@ -48,19 +49,75 @@ module.exports = function(app){
         newStudent.save(function(err){
             if(err) res.send(err);
 
-            Mentor.find({full: false, availability: newStudent.availability, subjects: newStudent.subjects}).sort({date: -1}).exec(function(err, docs){
+   //          Mentor.find({full: false, availability: newStudent.availability, subjects: newStudent.subjects}).sort({date: -1}).exec(function(err, docs){
+
+			// 	if (err) {
+		 //          	res.send(err);
+		 //        } else {
+
+		 //          	if (docs.length != 0) {
+		 //          		console.log(docs)
+		 //          	} else {
+		 //          		console.log("No matches found :(")
+		 //          	}
+		          	
+		 //        }
+			// });
+
+		Mentor
+		  .find({
+		  	full: false, 
+		  	// availability: req.body.availability, 
+		  	subjects: {$in: newStudent.subjects}
+		  })
+		  // .sort({date: -1})
+		  .exec(function(err, docs){
 
 				if (err) {
 		          	res.send(err);
 		        } else {
 
 		          	if (docs.length != 0) {
-		          		console.log(docs)
+		          		// console.log(docs)
+		          		res.send(docs)
+
+		          		var bestMatch;
+		          		var highestNumber = 0;
+
+		          		for (var i = 0; i < docs.length; i++) {
+		          			var subjectsInCommon = _.intersection(newStudent.subjects, docs[i].subjects).length
+		          			console.log( "You have " + subjectsInCommon + " subjects in common with " + docs[i].name );
+		          			if (subjectsInCommon > highestNumber) {
+		          				bestMatch = docs[i];
+		          				highestNumber = subjectsInCommon;
+		          			}
+		          		}
+
+		          		console.log("You have the most subjects in common with: " + bestMatch.name)
+		          		console.log("You have " + highestNumber + " subjects in common with " + bestMatch.name)
+
+		          		Mentor.findOneAndUpdate({'_id': bestMatch._id}, {$push:{"mentoring": newStudent._id}})
+							.exec(function(err, artdoc){
+								if (err){
+									console.log(err);
+								} else {
+									console.log(artdoc);
+
+									Student.findByIdAndUpdate(newStudent._id, { $set: { matched: true }}, function (err, student) {
+									  	if (err) return handleError(err);
+									  	// res.send(tank);
+									});
+
+								}
+							});
+
 		          	} else {
-		          		console.log("No matches found :(")
+		          		// console.log("No matches found :(")
+		          		res.send("No Matches found :(")
 		          	}
 		          	
 		        }
+
 			});
 
             // If no errors are found, it responds with a JSON of the new student
@@ -112,6 +169,55 @@ module.exports = function(app){
             // If no errors are found, it responds with a JSON of the new user
             // res.json(req.body);
         });
+	});
+
+	app.post('/api/match-test',
+	function(req, res) {
+
+		// console.log(req.body);
+		console.log(req.body.subjects)
+
+		Mentor
+		  .find({
+		  	full: false, 
+		  	// availability: req.body.availability, 
+		  	subjects: {$in: req.body.subjects}
+		  })
+		  // .sort({date: -1})
+		  .exec(function(err, docs){
+
+				if (err) {
+		          	res.send(err);
+		        } else {
+
+		          	if (docs.length != 0) {
+		          		// console.log(docs)
+		          		res.send(docs)
+
+		          		var bestMatch;
+		          		var highestNumber = 0;
+
+		          		for (var i = 0; i < docs.length; i++) {
+		          			var subjectsInCommon = _.intersection(req.body.subjects, docs[i].subjects).length
+		          			console.log( "You have " + subjectsInCommon + " subjects in common with " + docs[i].name );
+		          			if (subjectsInCommon > highestNumber) {
+		          				bestMatch = docs[i];
+		          				highestNumber = subjectsInCommon;
+		          			}
+		          		}
+
+		          		console.log("You have the most subjects in common with: " + bestMatch.name)
+		          		console.log("You have " + highestNumber + " subjects in common with " + bestMatch.name)
+
+		          	} else {
+		          		// console.log("No matches found :(")
+		          		res.send("No Matches found :(")
+		          	}
+		          	
+		        }
+
+			});
+
 	});
 
 }

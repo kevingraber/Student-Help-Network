@@ -8,7 +8,7 @@ var StudentSchema = new Schema({
     email: {type: String, required: true},
     section: {type: String, required: true},
     comfortLevel: {type: Number, required: true},
-    subjects: {type: String, required: true},
+    subjects: [{type: String, required: true}],
     availability: {type: String, required: true},
     additionalinfo: {type: String},
     matched: {type: Boolean, default: false},

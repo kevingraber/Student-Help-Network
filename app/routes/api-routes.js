@@ -28,6 +28,21 @@ module.exports = function(app){
 
 	})
 
+	// Route for getting information on a student.
+	app.get('/api/students/:id', 
+	function(req, res) {
+		Student.findById(req.params.id, function(err, student) {
+			res.json(student);
+		})
+	})
+
+	// Route for getting the information about a mentor.
+	app.get('/api/mentors/:id', function(req, res) {
+		Mentor.findById(req.params.id, function(err, mentor) {
+			res.json(mentor);
+		})
+	})
+
 	// Creates a new student.
 	app.post('/student-signup',
 	function(req, res){
@@ -147,27 +162,29 @@ module.exports = function(app){
        newMentor.save(function(err){
             if(err) res.send(err);
 
-            Student
-              .find({
-                matched: false, 
-                availability: newMentor.availability, 
-                subjects: {$in: newMentor.subjects}
-              })
-              .sort({date: -1})
-              .exec(function(err, docs){            	
-				if (err) {
-		          	res.send(err);
-		        } else {
-		          	if (docs.length != 0) {
-		          		console.log(docs)
-		          	} else {
-		          		console.log("No matches found :(")
-		          	}      
-		        }
-			});
+   //          Student
+   //            .find({
+   //              matched: false, 
+   //              availability: newMentor.availability, 
+   //              subjects: {$in: newMentor.subjects}
+   //            })
+   //            .sort({date: -1})
+   //            .exec(function(err, docs){            	
+			// 	if (err) {
+		 //          	res.send(err);
+		 //        } else {
+		 //          	if (docs.length != 0) {
+		 //          		console.log(docs)
+		 //          	} else {
+		 //          		console.log("No matches found :(")
+		 //          	}      
+		 //        }
+			// });
 
             // If no errors are found, it responds with a JSON of the new user
             // res.json(req.body);
+
+            res.send("Thank You for signing up!")
         });
 	});
 

@@ -15,8 +15,7 @@ var _ = require('lodash');
 module.exports = function(app){
 
 	// Returns a list of all students.
-	app.get('/api/student-list', 
-	function(req,res) {
+	app.get('/api/student-list', function(req,res) {
 
 		Student.find({}).sort({date: -1}).exec(function(err, docs){
 			if (err) {
@@ -29,8 +28,7 @@ module.exports = function(app){
 	})
 
 	// Route for getting information on a student.
-	app.get('/api/students/:id', 
-	function(req, res) {
+	app.get('/api/students/:id', function(req, res) {
 		Student.findById(req.params.id, function(err, student) {
 			res.json(student);
 		})
@@ -44,8 +42,7 @@ module.exports = function(app){
 	})
 
 	// Creates a new student.
-	app.post('/student-signup',
-	function(req, res){
+	app.post('/student-signup', function(req, res){
 		console.log(req.body)
 
 		// Creates a new Student based on the Mongoose schema and the post body
@@ -63,21 +60,6 @@ module.exports = function(app){
         // New Student is saved in the db.
         newStudent.save(function(err){
             if(err) res.send(err);
-
-   //          Mentor.find({full: false, availability: newStudent.availability, subjects: newStudent.subjects}).sort({date: -1}).exec(function(err, docs){
-
-			// 	if (err) {
-		 //          	res.send(err);
-		 //        } else {
-
-		 //          	if (docs.length != 0) {
-		 //          		console.log(docs)
-		 //          	} else {
-		 //          		console.log("No matches found :(")
-		 //          	}
-		          	
-		 //        }
-			// });
 
 		Mentor
 		  .find({
@@ -142,12 +124,12 @@ module.exports = function(app){
 		// res.send("Thanks for signing up!")
 	});
 
-	// Creates a new mentor.
-	app.post('/mentor-signup',
-	function(req, res){
-		console.log(req.body)
+	// Route for creating a new mentor.
+	app.post('/mentor-signup', function(req, res){
 
-		// Creates a new Playgroup based on the Mongoose schema and the post body
+		console.log(req.body);
+
+		// Creates a new mentor based on the Mongoose schema and the post body
         var newMentor = new Mentor({
             name: req.body.name,
             email: req.body.email,
@@ -158,38 +140,15 @@ module.exports = function(app){
             availability: req.body.availability,
         });
 
-        // New Playgroup is saved in the db.
-       newMentor.save(function(err){
+        // The new mentor is saved in the db.
+       	newMentor.save(function(err){
             if(err) res.send(err);
-
-   //          Student
-   //            .find({
-   //              matched: false, 
-   //              availability: newMentor.availability, 
-   //              subjects: {$in: newMentor.subjects}
-   //            })
-   //            .sort({date: -1})
-   //            .exec(function(err, docs){            	
-			// 	if (err) {
-		 //          	res.send(err);
-		 //        } else {
-		 //          	if (docs.length != 0) {
-		 //          		console.log(docs)
-		 //          	} else {
-		 //          		console.log("No matches found :(")
-		 //          	}      
-		 //        }
-			// });
-
-            // If no errors are found, it responds with a JSON of the new user
-            // res.json(req.body);
-
             res.send("Thank You for signing up!")
         });
+
 	});
 
-	app.post('/api/match-test',
-	function(req, res) {
+	app.post('/api/match-test', function(req, res) {
 
 		// console.log(req.body);
 		console.log(req.body.subjects)
@@ -202,6 +161,57 @@ module.exports = function(app){
 		  })
 		  // .sort({date: -1})
 		  .exec(function(err, docs){
+
+				if (err) {
+		          	res.send(err);
+		        } else {
+
+		          	if (docs.length != 0) {
+		          		// console.log(docs)
+		          		res.send(docs)
+
+		          		var bestMatch;
+		          		var highestNumber = 0;
+
+		          		for (var i = 0; i < docs.length; i++) {
+		          			var subjectsInCommon = _.intersection(req.body.subjects, docs[i].subjects).length
+		          			console.log( "You have " + subjectsInCommon + " subjects in common with " + docs[i].name );
+		          			if (subjectsInCommon > highestNumber) {
+		          				bestMatch = docs[i];
+		          				highestNumber = subjectsInCommon;
+		          			}
+		          		}
+
+		          		console.log("You have the most subjects in common with: " + bestMatch.name)
+		          		console.log("You have " + highestNumber + " subjects in common with " + bestMatch.name)
+
+		          	} else {
+		          		// console.log("No matches found :(")
+		          		res.send("No Matches found :(")
+		          	}
+		          	
+		        }
+
+			});
+
+	});
+
+	app.post('/api/newmatch-test', function(req, res) {
+
+		// console.log(req.body);
+		console.log(req.body.subjects)
+
+		var query = Mentor.find({full: false, subjects: {$in: req.body.subjects} });
+
+		Mentor
+		  .find({
+		  	full: false, 
+		  	// availability: req.body.availability, 
+		  	subjects: {$in: req.body.subjects}
+		  })
+		  .exec(function(err, docs){
+
+		  	
 
 				if (err) {
 		          	res.send(err);

@@ -7,6 +7,7 @@
 var mongoose = require('mongoose');
 var Student = require('../model/student.js');
 var Mentor = require('../model/mentor.js');
+var Professor = require('../model/professor.js');
 var _ = require('lodash');
 
 

@@ -10,6 +10,7 @@ var Mentor = require('../model/mentor.js');
 var Professor = require('../model/professor.js');
 var _ = require('lodash');
 var nodemailer = require('nodemailer');
+var passport = require('passport');
 
 // Setting up the account that will send the emails.
 var transporter = nodemailer.createTransport({
@@ -25,9 +26,17 @@ var transporter = nodemailer.createTransport({
 // =============================================================
 module.exports = function(app){
 
-	app.post('/login', function(req, res) {
-		console.log(req.body);
-	})
+	// Log in route.
+	app.post('/login', passport.authenticate('local', {failureRedirect: '/login',}), function(req, res) {
+		res.redirect('/api/mentors/' + req.user.id)
+	});
+
+	// Log out route.
+	app.get('/logout',
+  	function(req, res){
+		req.logout();
+    	res.redirect('/');
+ 	});
 
 	// Returns a list of all students.
 	app.get('/api/student-list', function(req,res) {
@@ -42,8 +51,24 @@ module.exports = function(app){
 
 	})
 
+	// Professor Routes
+	// =============================================================
 	app.get('/api/professor/:id', function(req, res) {
 		Student.find({section: req.params.id}, function(err, students) {
+			if (err) res.send(err);
+			res.json(students);
+		})
+	})
+
+	app.get('/api/professor/pending/:id', function(req, res) {
+		Mentor.find({section: req.params.id, approved: null}, function(err, students) {
+			if (err) res.send(err);
+			res.json(students);
+		})
+	})
+
+	app.get('/api/professor/approved/:id', function(req, res) {
+		Mentor.find({section: req.params.id, approved: true}, function(err, students) {
 			if (err) res.send(err);
 			res.json(students);
 		})

@@ -9,11 +9,25 @@ var Student = require('../model/student.js');
 var Mentor = require('../model/mentor.js');
 var Professor = require('../model/professor.js');
 var _ = require('lodash');
+var nodemailer = require('nodemailer');
+
+// Setting up the account that will send the emails.
+var transporter = nodemailer.createTransport({
+	service: 'gmail',
+	auth: {
+		user: 'shn.noreply@gmail.com',
+		pass: 'rutgers0451'
+	}
+});
 
 
 // Routes
 // =============================================================
 module.exports = function(app){
+
+	app.post('/login', function(req, res) {
+		console.log(req.body);
+	})
 
 	// Returns a list of all students.
 	app.get('/api/student-list', function(req,res) {
@@ -26,6 +40,13 @@ module.exports = function(app){
 	        }
 		});
 
+	})
+
+	app.get('/api/professor/:id', function(req, res) {
+		Student.find({section: req.params.id}, function(err, students) {
+			if (err) res.send(err);
+			res.json(students);
+		})
 	})
 
 	// Route for getting information on a student.
@@ -135,6 +156,8 @@ module.exports = function(app){
             name: req.body.name,
             email: req.body.email,
             section: req.body.section,
+            username: req.body.username,
+            password: req.body.password,
             comfortLevel: req.body.comfortLevel,
             subjects: req.body.subjects,
             numCanMentor: req.body.numCanMentor,
@@ -145,8 +168,33 @@ module.exports = function(app){
        	newMentor.save(function(err){
             if(err) res.send(err);
             res.send("Thank You for signing up!")
-        });
 
+            // Finding the professor of the mentor and sending them an email.
+            Professor.findOne({section: newMentor.section}, function(err, prof) {
+            	if (err) throw err;
+            	console.log(prof);
+            	console.log("You are in section: " + newMentor.section + ". Your Professor is " + prof.name + ". His email is " + prof.email + ".");
+
+            			// Email options.
+						var mailOptions = {
+						    from: '"Student Help Network" <shn.noreply@gmail.com>', // sender address
+						    // to: 'bar@blurdybloop.com, baz@blurdybloop.com', // list of receivers
+						    to: prof.email,
+						    subject: 'New Mentor Request', // Subject line
+						    // text: 'One of your students' + newMentor.name + 'is requesting to be a mentor. Log in to accept or deny them.', // plaintext body
+						    html: '<p>One of your students ' + newMentor.name + ' is requesting to be a mentor.</p> <p>Log in to accept or deny them.</p> <a href="http://google.com">link will be here!</a>' // html body
+						};
+
+						// Send mail with defined transport object.
+						transporter.sendMail(mailOptions, function(error, info){
+						    if(error){
+						        return console.log(error);
+						    }
+						    console.log('Message sent: ' + info.response);
+						    // res.send("Email sent successfully!")
+						});
+				            })
+				        });
 	});
 
 	app.post('/api/match-test', function(req, res) {
@@ -247,5 +295,57 @@ module.exports = function(app){
 			});
 
 	});
+
+	// Create a new professor.
+	app.post('/new-professor', function(req, res) {
+
+		// Creates a new professor based on the Mongoose schema and the post body.
+		var newProfessor = new Professor({
+            name: req.body.name,
+            email: req.body.email,
+            section: req.body.section
+        });
+
+		// The new professor is saved in the db.
+       	newProfessor.save(function(err){
+            if(err) res.send(err);
+            res.send("Thank You for signing up!");
+        });
+
+	});
+
+	app.post('/approve', function(req, res) {
+
+		Mentor.findByIdAndUpdate('57c0a5805d5ae1640f98c784', { $set: { approved: true }}, function(err, mentor) {
+			if (err) handleError(err);
+			res.send("Mentor Approved!")
+		});
+
+	});
+
+	app.post('/email-test', function(req, res) {
+
+		// console.log(req.body)
+
+		// setup e-mail data with unicode symbols
+		var mailOptions = {
+		    from: '"Student Help Network" <shn.noreply@gmail.com>', // sender address
+		    // to: 'bar@blurdybloop.com, baz@blurdybloop.com', // list of receivers
+		    to: req.body.address,
+		    subject: 'Test!', // Subject line
+		    text: 'This is a test!', // plaintext body
+		    html: '<b>Hello world 🐴</b>' // html body
+		};
+
+		// send mail with defined transport object
+		transporter.sendMail(mailOptions, function(error, info){
+		    if(error){
+		        return console.log(error);
+		    }
+		    console.log('Message sent: ' + info.response);
+		    res.send("Email sent successfully!")
+		});
+
+	})
 
 }

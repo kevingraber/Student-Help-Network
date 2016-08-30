@@ -2,13 +2,11 @@
 var mongoose    = require('mongoose');
 var Schema      = mongoose.Schema;
 
-// Creates a Mentor Schema. This will be the basis of how mentor data is stored in the db.
-var MentorSchema = new Schema({
+// Creates a PendingMentor Schema. This will be the basis of how pending mentor data is stored in the db.
+var PendingMentorSchema = new Schema({
     name: {type: String, required: true},
-    email: {type: String, required: true, unique: true},
+    email: {type: String, required: true},
     section: {type: String, required: true},
-    username: {type: String, required: true, unique: true},
-    password: {type: String, required: true},
     comfortLevel: {type: Number, required: true},
     subjects: [{type: String, required: true}],
     numCanMentor: {type: Number, required: true},
@@ -17,14 +15,13 @@ var MentorSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Students'
     }],
-    approved: {type: Boolean, default: null},
     full: {type: Boolean, default: false},
     created_at: {type: Date, default: Date.now},
     updated_at: {type: Date, default: Date.now}
 });
 
 // Sets the created_at parameter equal to the current time
-MentorSchema.pre('save', function(next){
+PendingMentorSchema.pre('save', function(next){
     now = new Date();
     this.updated_at = now;
     if(!this.created_at) {
@@ -33,5 +30,5 @@ MentorSchema.pre('save', function(next){
     next();
 });
 
-// Exports the MentorSchema for use elsewhere. Sets the MongoDB collection to be used as: "mentors"
-module.exports = mongoose.model('mentor', MentorSchema);
+// Exports the MentorSchema for use elsewhere. Sets the MongoDB collection to be used as: "pendingMentors"
+module.exports = mongoose.model('pendingMentor', PendingMentorSchema);

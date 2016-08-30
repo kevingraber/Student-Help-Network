@@ -15,12 +15,22 @@ module.exports = function(app){
 		res.sendFile(path.join(__dirname+'/../public/student.html'));
 	});
 
+	app.get('/login',
+	function(req, res){
+		res.sendFile(path.join(__dirname+'/../public/index.html'));
+	});
+
 	app.get('/admin',
 	function(req, res){
 		res.sendFile(path.join(__dirname+'/../public/admin.html'));
 	});
 
 	app.get('/mentor',
+	function(req, res){
+		res.sendFile(path.join(__dirname+'/../public/mentor.html'));
+	});
+
+	app.get('/professor',
 	function(req, res){
 		res.sendFile(path.join(__dirname+'/../public/mentor.html'));
 	});

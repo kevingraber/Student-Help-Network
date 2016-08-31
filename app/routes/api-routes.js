@@ -27,8 +27,13 @@ var transporter = nodemailer.createTransport({
 module.exports = function(app){
 
 	// Log in route.
-	app.post('/login', passport.authenticate('local', {failureRedirect: '/login',}), function(req, res) {
+	app.post('/login', passport.authenticate('mentor', {failureRedirect: '/login',}), function(req, res) {
 		res.redirect('/api/mentors/' + req.user.id)
+	});
+
+	// Log in route.
+	app.post('/login-professor', passport.authenticate('professor', {failureRedirect: '/login',}), function(req, res) {
+		res.redirect('/professor')
 	});
 
 	// Log out route.
@@ -328,7 +333,9 @@ module.exports = function(app){
 		var newProfessor = new Professor({
             name: req.body.name,
             email: req.body.email,
-            section: req.body.section
+            section: req.body.section,
+            username: req.body.username,
+            password: req.body.password
         });
 
 		// The new professor is saved in the db.

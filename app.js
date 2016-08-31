@@ -12,19 +12,54 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var Mentor = require('./app/model/mentor.js');
+var Professor = require('./app/model/professor.js');
 
 // Passport
 // =============================================================
-passport.use(new LocalStrategy(
+// passport.use(new LocalStrategy(
+//   function(username, password, done) {
+//     Mentor.findOne({ username: username }, function(err, user) {
+//       if (err) { return done(err); }
+//       if (!user) {
+//       	console.log('Incorrect username.')
+//         return done(null, false, { message: 'Incorrect username.' });
+//       }
+//       if (user.password != password) {
+//       	console.log('Incorrect password.')
+//         return done(null, false, { message: 'Incorrect password.' });
+//       }
+//       return done(null, user);
+//     });
+//   }
+// ));
+
+passport.use('mentor', new LocalStrategy(
   function(username, password, done) {
     Mentor.findOne({ username: username }, function(err, user) {
       if (err) { return done(err); }
       if (!user) {
-      	console.log('Incorrect username.')
+        console.log('Incorrect username.')
         return done(null, false, { message: 'Incorrect username.' });
       }
       if (user.password != password) {
-      	console.log('Incorrect password.')
+        console.log('Incorrect password.')
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user);
+    });
+  }
+));
+
+passport.use('professor', new LocalStrategy(
+  function(username, password, done) {
+    Professor.findOne({ username: username }, function(err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        console.log('Incorrect username.')
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (user.password != password) {
+        console.log('Incorrect password.')
         return done(null, false, { message: 'Incorrect password.' });
       }
       return done(null, user);

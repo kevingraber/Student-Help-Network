@@ -22,6 +22,10 @@ module.exports = function(app){
 		res.render('mentor-signup');
 	})
 
+	app.get('/', function(req, res){
+		res.render('login');
+	});
+
 	// app.get('/student',
 	// function(req, res){
 	// 	res.sendFile(path.join(__dirname+'/../public/student.html'));
@@ -32,10 +36,10 @@ module.exports = function(app){
 		res.sendFile(path.join(__dirname+'/../public/index.html'));
 	});
 
-	app.get('/',
-	function(req, res){
-		res.sendFile(path.join(__dirname+'/../public/index.html'));
-	});
+	// app.get('/',
+	// function(req, res){
+	// 	res.sendFile(path.join(__dirname+'/../public/index.html'));
+	// });
 
 	app.get('/admin',
 	function(req, res){

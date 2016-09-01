@@ -4,8 +4,7 @@
   "description": "App to connect students with mentors.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -30,8 +29,5 @@
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "path": "^0.12.7"
-  },
-  "engines": {
-    "node": "5.10.1"
   }
 }

@@ -26,14 +26,44 @@ var transporter = nodemailer.createTransport({
 // =============================================================
 module.exports = function(app){
 
+	app.get('/api/section/:id', function(req, res) {
+		Student.find({section: req.params.id}, function(err, students) {
+			if (err) res.send(err);
+			res.send(students);
+		});
+	});
+
+	app.get('/testy', function(req, res) {
+		Mentor.findOne({_id: '57b77203d0de5dbc343607ef'}).populate('mentoring').exec(function(err, mentor) {
+			if (err) res.send(err);
+			res.send(mentor)
+			console.log(mentor)
+		})
+	});
+
+	app.post('/api/ping', function(req, res) {
+		console.log(req.user)
+	})
+
 	// Log in route.
+	// app.post('/login', passport.authenticate('mentor', {failureRedirect: '/login',}), function(req, res) {
+	// 	res.redirect('/api/mentors/' + req.user.id)
+	// });
 	app.post('/login', passport.authenticate('mentor', {failureRedirect: '/login',}), function(req, res) {
-		res.redirect('/api/mentors/' + req.user.id)
+		Mentor.findOne({_id: req.user.id}).populate('mentoring').exec(function(err, mentor) {
+			if (err) res.send(err);
+			res.render('mentor', {user: mentor})
+		})
+
+		// res.render('mentor', {user: req.user})
 	});
 
 	// Log in route.
 	app.post('/login-professor', passport.authenticate('professor', {failureRedirect: '/login',}), function(req, res) {
-		res.redirect('/professor')
+		Mentor.find({section: req.user.section, approved: null}, function(err, students) {
+			if (err) res.send(err);
+			res.render('professor', {user: req.user, pendingmentor: students})
+		})
 	});
 
 	// Log out route.
@@ -42,6 +72,46 @@ module.exports = function(app){
 		req.logout();
     	res.redirect('/');
  	});
+
+
+	// Approve
+	app.post('/api/approve/:mentorid', function(req, res) {
+
+		Mentor.findByIdAndUpdate(req.params.mentorid, { $set: { approved: true }}, function(err, mentor) {
+			if (err) handleError(err);
+			// console.log(req.user)
+			console.log(req.user.name + " has successfully approved " + mentor.name + " as a mentor!");
+			Mentor.find({section: req.user.section, approved: null}, function(err, students) {
+				if (err) res.send(err);
+				res.render('professor', {user: req.user, pendingmentor: students})
+			})
+		});
+
+		// console.log("worked!")
+		// Mentor.findById(req.params.mentorid, function(err, mentor) {
+		// 	console.log("You are approving " + mentor.name)
+		// })
+	})
+
+	// Deny
+	app.post('/api/deny/:mentorid', function(req, res) {
+
+		console.log(req.user)
+
+		Mentor.findByIdAndUpdate(req.params.mentorid, { $set: { approved: false }}, function(err, mentor) {
+			if (err) handleError(err);
+			console.log(req.user.name + " has denied " + mentor.name + " as a mentor!");
+			res.end();
+		});
+		// console.log("worked!")
+		// Mentor.findById(req.params.mentorid, function(err, mentor) {
+		// 	// console.log(mentor)
+		// 	console.log("You are approving " + mentor.name)
+		// })
+	})
+
+
+
 
 	// Returns a list of all students.
 	app.get('/api/student-list', function(req,res) {
@@ -93,8 +163,178 @@ module.exports = function(app){
 		})
 	})
 
-	// Creates a new student.
-	app.post('/student-signup', function(req, res){
+	app.post('/student-signup', function(req, res) {
+
+		// Creates a new Student based on the Mongoose schema and the post body
+        var newStudent = new Student({
+            name: req.body.name,
+            email: req.body.email,
+            section: req.body.section,
+            comfortLevel: req.body.comfortLevel,
+            subjects: req.body.subjects,
+            availability: req.body.availability,
+            additionalinfo: req.body.additionalinfo,
+
+        });
+
+        // New Student is saved in the db.
+        newStudent.save(function(err){
+
+        	console.log(req.body)
+
+            if(err) res.send(err);
+
+            //====
+
+            // Search for a mentor with the same availability and atleast one subject in common.
+			Mentor
+			  .find({
+			  	approved: true, 						// Mentor must be approved by their professor.
+			  	availability: newStudent.availability, 	// Same availability.
+			  	subjects: {$in: newStudent.subjects}		// At least one subject in common.
+			  })
+			  .sort({mentoring: 1}) 					// Sort by lest number of mentees first.
+			  .exec(function(err, docs){
+
+				if (err) res.send(err);
+
+				// If we get results...
+	          	if (docs.length != 0) {
+
+	          		res.send(docs)
+	          		console.log("You have been matched with " + docs[0])
+
+	          		// Updating the database with the match.
+	          		Mentor.findOneAndUpdate({'_id': docs[0]._id}, {$push:{"mentoring": newStudent._id}})
+						.exec(function(err, artdoc){
+							if (err){
+								console.log(err);
+							} else {
+								console.log(artdoc);
+								Student.findByIdAndUpdate(newStudent._id, { $set: { matched: true }}, function (err, student) {
+								  	if (err) return handleError(err);
+								});
+							}
+						});
+
+	          	// If a match can't be found with availability & subjects...
+	          	} else {
+
+	          		// We will look for someone with just the same availability.
+	          		Mentor.find({
+	          			approved: true,
+	          			availability: newStudent.availability
+	          		})
+	          		.sort({mentoring: 1})
+	          		.exec(function(err, mentdocs) {
+
+	          			if (err) res.send(err);
+
+	          			// If we get results...
+	          			if (mentdocs.length != 0) {
+
+	          				res.send(mentdocs)
+	          				console.log("You have been matched with " + mentdocs[0].name)
+
+	          				// Updating the database with the match.
+			          		Mentor.findOneAndUpdate({'_id': mentdocs[0]._id}, {$push:{"mentoring": newStudent._id}})
+								.exec(function(err, artdoc){
+									if (err){
+										console.log(err);
+									} else {
+										console.log(artdoc);
+										Student.findByIdAndUpdate(newStudent._id, { $set: { matched: true }}, function (err, student) {
+										  	if (err) return handleError(err);
+										});
+									}
+								});
+
+	          			// If a match can't be found with the same availability...
+	          			} else {
+
+	          				console.log("REALLY? NO ONE?!")
+
+	          				// We will look for a mentor that shares a subject.
+	          				Mentor.find({
+	          					approved: true,
+	          					subjects: {$in: newStudent.subjects}
+	          				})
+	          				.sort({mentoring: 1})
+	          				.exec(function(err, desperatedocs) {
+
+	          					if (err) res.send(err);
+
+	          					// If we get results...
+	          					if (desperatedocs != 0) {
+
+	          						res.send(desperatedocs)
+	          						console.log("You have been matched with " + desperatedocs[0].name)
+
+	          						// Updating the database with the match.
+					          		Mentor.findOneAndUpdate({'_id': desperatedocs[0]._id}, {$push:{"mentoring": newStudent._id}})
+										.exec(function(err, artdoc){
+											if (err){
+												console.log(err);
+											} else {
+												console.log(artdoc);
+												Student.findByIdAndUpdate(newStudent._id, { $set: { matched: true }}, function (err, student) {
+												  	if (err) return handleError(err);
+												});
+											}
+										});
+
+	          					// If a match can't be found...
+	          					} else {
+
+	          						console.log("...really?")
+
+	          						// We just grab the first mentor we can!
+	          						Mentor.find({
+	          							approved: true
+	          						})
+	          						.sort({mentoring: 1})
+	          						.exec(function(err, destitutedocs) {
+
+	          							if (err) res.send(err);
+	          							res.send(destitutedocs);
+	          							console.log("You have been matched with " + destitutedocs[0].name + ". May god have mercy on your soul.")
+
+	          							// Updating the database with the match.
+						          		Mentor.findOneAndUpdate({'_id': destitutedocs[0]._id}, {$push:{"mentoring": newStudent._id}})
+											.exec(function(err, artdoc){
+												if (err){
+													console.log(err);
+												} else {
+													console.log(artdoc);
+													Student.findByIdAndUpdate(newStudent._id, { $set: { matched: true }}, function (err, student) {
+													  	if (err) return handleError(err);
+													});
+												}
+											});
+
+	          						})
+
+	          					}
+
+	          				})
+
+	          			}
+
+	          		})
+
+	          	}
+		          	
+			});
+
+            //====
+			
+		});
+
+
+	})
+
+	// Creates a new student. **OLD WAY**
+	app.post('/old-student-signup', function(req, res){
 		console.log(req.body)
 
 		// Creates a new Student based on the Mongoose schema and the post body
@@ -115,7 +355,8 @@ module.exports = function(app){
 
 		Mentor
 		  .find({
-		  	full: false, 
+		  	full: false,
+		  	approved: true, 
 		  	// availability: req.body.availability, 
 		  	subjects: {$in: newStudent.subjects}
 		  })
@@ -227,50 +468,109 @@ module.exports = function(app){
 				        });
 	});
 
+	app.post('/api/mentors/', function(req, res) {
+		console.log('hi!')
+		console.log(req.body)
+		console.log(req.params)
+		console.log(req.params.num)
+		// Mentor.find({availability: req.params.availability}).exec(function(err, mentors) {
+		// 	if (err) res.send(err);
+		// 	res.send(mentors);
+		// })
+		res.end();
+	})
+
 	app.post('/api/match-test', function(req, res) {
 
 		// console.log(req.body);
 		console.log(req.body.subjects)
+		console.log(req.body.availability)
+		console.log(req.body.approved)
 
+		// Search for a mentor with the same availability and atleast one subject in common.
 		Mentor
 		  .find({
-		  	full: false, 
-		  	// availability: req.body.availability, 
-		  	subjects: {$in: req.body.subjects}
+		  	approved: true, 						// Mentor must be approved by their professor.
+		  	availability: req.body.availability, 	// Same availability.
+		  	subjects: {$in: req.body.subjects}		// At least one subject in common.
 		  })
-		  // .sort({date: -1})
+		  .sort({mentoring: 1}) 					// Sort by lest number of mentees first.
 		  .exec(function(err, docs){
 
-				if (err) {
-		          	res.send(err);
-		        } else {
+				if (err) res.send(err);
 
-		          	if (docs.length != 0) {
-		          		// console.log(docs)
-		          		res.send(docs)
+				// If we get results...
+	          	if (docs.length != 0) {
 
-		          		var bestMatch;
-		          		var highestNumber = 0;
+	          		res.send(docs)
+	          		console.log("You have been matched with " + docs[0])
 
-		          		for (var i = 0; i < docs.length; i++) {
-		          			var subjectsInCommon = _.intersection(req.body.subjects, docs[i].subjects).length
-		          			console.log( "You have " + subjectsInCommon + " subjects in common with " + docs[i].name );
-		          			if (subjectsInCommon > highestNumber) {
-		          				bestMatch = docs[i];
-		          				highestNumber = subjectsInCommon;
-		          			}
-		          		}
+	          	// If a match can't be found with availability & subjects...
+	          	} else {
 
-		          		console.log("You have the most subjects in common with: " + bestMatch.name)
-		          		console.log("You have " + highestNumber + " subjects in common with " + bestMatch.name)
+	          		// We will look for someone with just the same availability.
+	          		Mentor.find({
+	          			approved: true,
+	          			availability: req.body.availability
+	          		})
+	          		.sort({mentoring: 1})
+	          		.exec(function(err, mentdocs) {
 
-		          	} else {
-		          		// console.log("No matches found :(")
-		          		res.send("No Matches found :(")
-		          	}
+	          			if (err) res.send(err);
+
+	          			// If we get results...
+	          			if (mentdocs.length != 0) {
+
+	          				res.send(mentdocs)
+	          				console.log("You have been matched with " + mentdocs[0].name)
+
+	          			// If a match can't be found with the same availability...
+	          			} else {
+
+	          				console.log("REALLY? NO ONE?!")
+
+	          				// We will look for a mentor that shares a subject.
+	          				Mentor.find({
+	          					approved: true,
+	          					subjects: {$in: req.body.subjects}
+	          				})
+	          				.sort({mentoring: 1})
+	          				.exec(function(err, desperatedocs) {
+
+	          					if (err) res.send(err);
+
+	          					// If we get results...
+	          					if (desperatedocs != 0) {
+
+	          						res.send(desperatedocs)
+	          						console.log("You have been matched with " + desperatedocs[0].name)
+
+	          					// If a match can't be found...
+	          					} else {
+
+	          						console.log("...really?")
+
+	          						// We just grab the first mentor we can!
+	          						Mentor.find({
+	          							approved: true
+	          						})
+	          						.sort({mentoring: 1})
+	          						.exec(function(err, destitutedocs) {
+	          							if (err) res.send(err);
+	          							res.send(destitutedocs);
+	          							console.log("You have been matched with " + destitutedocs[0].name + ". May god have mercy on your soul.")
+	          						})
+
+	          					}
+
+	          				})
+
+	          			}
+
+	          		})
+
+	          	}
 		          	
-		        }
-
 			});
 
 	});

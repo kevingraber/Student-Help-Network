@@ -13,6 +13,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var Mentor = require('./app/model/mentor.js');
 var Professor = require('./app/model/professor.js');
+var exphbs  = require('express-handlebars');
 
 // Passport
 // =============================================================
@@ -69,14 +70,42 @@ passport.use('professor', new LocalStrategy(
 
 // Attaches the id of the user to our session.
 passport.serializeUser(function(user, done) {
-  	done(null, user.id);
+  console.log(user)
+  console.log(user.role)
+  console.log(user.id)
+  console.log(user.username)
+    var userType;
+    if (user.role == 'mentor') {
+      userType = "mentor";
+    } else if (user.role == "professor") {
+      userType = "professor";
+    } else {
+      console.log("There is a problem in the serialization")
+    }
+  	done(null, { id: user.id, userType: userType } );
 });
 
 // Retrieves the user information from the database and attaches it to the request object as req.user.
+// passport.deserializeUser(function(id, done) {
+//   Professor.findById(id, function(err, user) {
+//     done(err, user);
+//   });
+// });
+
 passport.deserializeUser(function(id, done) {
-  User.findById(id, function(err, user) {
-    done(err, user);
-  });
+
+  if (id.userType == "professor") {
+    Professor.findById(id.id, function(err, user) {
+      done(err, user);
+    });
+  } else if (id.userType == "mentor") {
+    Mentor.findById(id.id, function(err, user) {
+      done(err, user);
+    });
+  } else {
+    console.log("There is a problem in the deserialization WHY GOD WHY")
+  }
+
 });
 
 
@@ -101,12 +130,18 @@ app.use(bodyParser.json({type:'application/vnd.api+json'}));
 app.use(express.static(__dirname + '/app/public'));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
+app.use(require('cookie-parser')());
+app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
 
 // Initializes passport.
 app.use(passport.initialize());
 // Required for persistent login sessions.
 app.use(passport.session());
 
+
+app.engine('handlebars', exphbs({defaultLayout: 'main', layoutsDir: 'app/views/layouts'}));
+app.set('view engine', 'handlebars');
+app.set('views', __dirname + '/app/views');
 
 
 // Routes

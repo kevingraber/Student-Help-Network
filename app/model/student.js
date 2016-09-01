@@ -27,4 +27,4 @@ StudentSchema.pre('save', function(next){
 });
 
 // Exports the StudentSchema for use elsewhere. Sets the MongoDB collection to be used as: "students"
-module.exports = mongoose.model('student', StudentSchema);
+module.exports = mongoose.model('Student', StudentSchema);

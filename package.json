@@ -18,7 +18,10 @@
   "homepage": "https://github.com/kevingraber/Student-Help-Network#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
+    "express-handlebars": "^3.0.0",
+    "express-session": "^1.14.1",
     "lodash": "^4.15.0",
     "mongoose": "^4.5.9",
     "morgan": "^1.7.0",

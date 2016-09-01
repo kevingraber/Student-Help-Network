@@ -1,0 +1,87 @@
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+{{!--       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button> --}}
+      <a class="navbar-brand" href="#">{{user.name}}</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Mentors<span class="sr-only">(current)</span></a></li>
+        <li><a href="#">Account</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/logout">Log Out</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<div class="jumbotron">
+	<h1 class="text-center"> Welcome {{ user.name }} </h1>
+</div>
+
+<div class="row">
+	<div class="col-md-8 col-md-offset-2">
+		<h2>Pending Mentors</h2>
+		<div class="mentors">
+			{{#each pendingmentor}}
+				<div class="well">
+					<p>{{name}}</p>
+					<p>Wants to teach:</p>
+					<ul>
+					{{#each subjects}}
+						<li>{{this}}</li>
+					{{/each}}
+					</ul>
+					<p>Email: {{email}}</p>
+					<button class="btn btn-success approveButton" onClick="approve('{{id}}')">
+						<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
+					</button>
+					<button class="btn btn-danger denyButton" onClick="deny('{{id}}')">
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+					</button>
+				</div>
+			{{/each}}
+		</div>
+	</div>
+</div>
+
+<script>
+
+function approve(id) {
+	var originURL = document.location.origin;
+	// alert(originURL)
+	$.post( originURL + "/api/approve/" + id)
+        .done(function(data){
+          console.log(data);
+          // alert("Preparing to send")
+        })
+}
+
+function deny(id) {
+
+	var originURL = document.location.origin;
+	$.post( originURL + "/api/deny/" + id).done(function(){
+        // alert("Preparing to send");
+    });
+
+}
+
+
+$('.denyButton').click(function() {
+	$(this).closest('div').remove();
+});
+
+$('.approveButton').click(function() {
+	$(this).closest('div').remove();
+});
+
+</script>

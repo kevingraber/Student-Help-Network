@@ -15,10 +15,11 @@ var MentorSchema = new Schema({
     availability: {type: String, required: true},
     mentoring: [{
         type: Schema.Types.ObjectId,
-        ref: 'Students'
+        ref: 'Student'
     }],
     approved: {type: Boolean, default: null},
     full: {type: Boolean, default: false},
+    role: {type: String, default: 'mentor'},
     created_at: {type: Date, default: Date.now},
     updated_at: {type: Date, default: Date.now}
 });
@@ -34,4 +35,4 @@ MentorSchema.pre('save', function(next){
 });
 
 // Exports the MentorSchema for use elsewhere. Sets the MongoDB collection to be used as: "mentors"
-module.exports = mongoose.model('mentor', MentorSchema);
+module.exports = mongoose.model('Mentor', MentorSchema);

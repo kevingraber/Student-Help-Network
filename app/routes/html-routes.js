@@ -10,10 +10,22 @@ var path = require('path');
 // =============================================================
 module.exports = function(app){
 
-	app.get('/student',
-	function(req, res){
-		res.sendFile(path.join(__dirname+'/../public/student.html'));
+	app.get('/handlebars', function(req, res) {
+		res.render('home');
 	});
+
+	app.get('/student', function(req, res){
+		res.render('student');
+	});
+
+	app.get('/mentor-signup', function(req, res) {
+		res.render('mentor-signup');
+	})
+
+	// app.get('/student',
+	// function(req, res){
+	// 	res.sendFile(path.join(__dirname+'/../public/student.html'));
+	// });
 
 	app.get('/login',
 	function(req, res){
@@ -25,10 +37,10 @@ module.exports = function(app){
 		res.sendFile(path.join(__dirname+'/../public/admin.html'));
 	});
 
-	app.get('/mentor',
-	function(req, res){
-		res.sendFile(path.join(__dirname+'/../public/mentor.html'));
-	});
+	// app.get('/mentor',
+	// function(req, res){
+	// 	res.sendFile(path.join(__dirname+'/../public/mentor.html'));
+	// });
 
 	app.get('/professor',
 	function(req, res){

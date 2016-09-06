@@ -11,7 +11,7 @@ var MentorSchema = new Schema({
     password: {type: String, required: true},
     comfortLevel: {type: Number, required: true},
     subjects: [{type: String, required: true}],
-    numCanMentor: {type: Number, required: true},
+    // numCanMentor: {type: Number, required: true},
     availability: {type: String, required: true},
     mentoring: [{
         type: Schema.Types.ObjectId,
@@ -19,7 +19,7 @@ var MentorSchema = new Schema({
     }],
     approved: {type: Boolean, default: null},
     mentorlevel: {type: Number, default: null},
-    full: {type: Boolean, default: false},
+    // full: {type: Boolean, default: false},
     role: {type: String, default: 'mentor'},
     created_at: {type: Date, default: Date.now},
     updated_at: {type: Date, default: Date.now}

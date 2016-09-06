@@ -12,8 +12,6 @@ var _ = require('lodash');
 var nodemailer = require('nodemailer');
 var passport = require('passport');
 
-var College = require('../model/college.js');
-
 // Setting up the account that will send the emails.
 var transporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -27,23 +25,6 @@ var transporter = nodemailer.createTransport({
 // Routes
 // =============================================================
 module.exports = function(app){
-
-	// New College
-	app.post('/api/new-college', function(req, res) {
-
-		// Creates a new professor based on the Mongoose schema and the post body.
-		var newCollege = new College({
-            name: req.body.name,
-            sections: req.body.sections
-        });
-
-		// The new professor is saved in the db.
-       	newCollege.save(function(err){
-            if(err) res.send(err);
-            res.send("Thank You for signing up!");
-        });
-
-	});
 
 	app.get('/api/colleges', function(req, res) {
 
@@ -127,7 +108,7 @@ module.exports = function(app){
 	});
 
 	// Professor log in route.
-	app.post('/professor', passport.authenticate('professor', {failureRedirect: '/login',}), function(req, res) {
+	app.post('/professor', passport.authenticate('professor', {failureRedirect: '/',}), function(req, res) {
 		// Grabbing all of the pending mentors in the professors section.
 		// Mentor.find({section: req.user.section, approved: null}, function(err, students) {
 		// 	if (err) res.send(err);
@@ -510,7 +491,7 @@ module.exports = function(app){
             password: req.body.password,
             comfortLevel: req.body.comfortLevel,
             subjects: req.body.subjects,
-            numCanMentor: req.body.numCanMentor,
+            // numCanMentor: req.body.numCanMentor,
             availability: req.body.availability,
         });
 

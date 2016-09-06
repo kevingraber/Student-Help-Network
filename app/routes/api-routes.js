@@ -148,7 +148,7 @@ module.exports = function(app){
 
 		Mentor.findByIdAndUpdate(req.params.mentorid, { $set: { approved: false }}, function(err, mentor) {
 			if (err) handleError(err);
-			console.log(req.user.name + " has denied " + mentor.name + " as a mentor!");
+			// console.log(req.user.name + " has denied " + mentor.name + " as a mentor!");
 			res.end();
 		});
 		// console.log("worked!")

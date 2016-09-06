@@ -38,7 +38,7 @@
 				<li>{{this}}</li>
 				{{/each}}
 			</ul>
-			<p>Willing to mentor: {{user.numCanMentor}}</p>
+			{{!-- <p>Willing to mentor: {{user.numCanMentor}}</p> --}}
 			<p>Availability: {{user.availability}}</p>
 		</div>
 	</div>
@@ -60,22 +60,7 @@
 		</div>
 	{{/each}}
 
-	{{#each user.mentoring}}
-		<div class="row">
-			<div class="col-md-8 col-md-offset-2 bordered">
-				{{email}}
-			</div>
-		</div>
-	{{/each}}
 
-	<style>
-		.bordered{
-			border-style: solid;
-			border-color: black;
-			border-width: 5px;
-			font-size: 24px;
-		}
-	</style>
 
 	{{!-- <p>
 		<a href="/logout">Log Out</a>

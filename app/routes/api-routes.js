@@ -88,7 +88,7 @@ module.exports = function(app){
 	});
 
 	app.get('/testy', function(req, res) {
-		Mentor.findOne({_id: '57b77203d0de5dbc343607ef'}).populate('mentoring').exec(function(err, mentor) {
+		Mentor.findOne({name: 'Kevin'}).populate('mentoring').exec(function(err, mentor) {
 			if (err) res.send(err);
 			res.send(mentor)
 			console.log(mentor)

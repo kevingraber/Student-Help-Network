@@ -56,11 +56,32 @@ module.exports = function(app){
 
 	// Professor main page.
 	app.get('/professor', isAuthenticatedProfessor, function(req, res) {
-		Mentor.find({section: req.user.section, approved: null}, function(err, students) {
-			if (err) res.send(err);
-			res.render('professor', {user: req.user, pendingmentor: students})
-		});
+		// Mentor.find({section: req.user.section, approved: null}, function(err, students) {
+		// 	if (err) res.send(err);
+		// 	res.render('professor', {user: req.user, pendingmentor: students})
+		// });
 		// res.render('professor', {user: req.user})
+		Mentor.find({section: req.user.section}).populate('mentoring').exec(function(err, mentors) {
+			if (err) res.send(err);
+
+			var currentMentors = [];
+			var pendingMentors = [];
+			var deniedMentors = [];
+
+			for (var i = 0; i < mentors.length; i++) {
+				if (mentors[i].approved == true) {
+					currentMentors.push(mentors[i])
+				} else if (mentors[i].approved == false) {
+					deniedMentors.push(mentors[i])
+				} else {
+					pendingMentors.push(mentors[i])
+				}
+			}
+
+			console.log(mentors)
+
+			res.render('professor', {user: req.user, currentmentors: currentMentors, pendingmentors: pendingMentors, deniedmentors: deniedMentors})
+		});
 	});
 
 	// Professor account info page.

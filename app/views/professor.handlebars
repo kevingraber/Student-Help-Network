@@ -65,6 +65,34 @@
 	</div>
 </div>
 
+<div class="row">
+	<div class="col-md-8 col-md-offset-2">
+		<h2>Current Mentors</h2>
+		<div class="mentors">
+			{{#if currentmentors}}
+				{{#each currentmentors}}
+					<div class="well">
+						<p>{{name}}</p>
+						<p>is currently mentoring:</p>
+						{{#if mentoring}}
+							<ul>
+							{{#each mentoring}}
+								<li>{{name}} - {{email}}</li>
+							{{/each}}
+							</ul>
+						{{else}}
+							<p>No one!</p>
+						{{/if}}
+						<p>Email: {{email}}</p>
+					</div>
+				{{/each}}
+			{{else}}
+				<p>No current mentors!</p>
+			{{/if}}
+		</div>
+	</div>
+</div>
+
 <script>
 
 function approve(id) {

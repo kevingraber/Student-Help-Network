@@ -72,7 +72,28 @@ module.exports = function(app){
 	// =========================================================
 
 	app.get('/admin', function(req, res){
-		res.sendFile(path.join(__dirname+'/../public/admin.html'));
+
+		Mentor.find(function(err, mentors) {
+			if (err) res.send(err);
+
+			var approvedMentors = [];
+			var pendingMentors = [];
+			var deniedMentors = [];
+
+			for (var i = 0; i < mentors.length; i++) {
+				if (mentors[i].approved == true) {
+					approvedMentors.push(mentors[i])
+				} else if (mentors[i].approved == false) {
+					deniedMentors.push(mentors[i])
+				} else {
+					pendingMentors.push(mentors[i])
+				}
+			}
+
+			// res.send(mentors);
+			res.render('admin', {approvedmentors: approvedMentors, pendingmentors: pendingMentors, deniedmentors: deniedMentors})
+		})
+
 	});
 
 	// Functions! Yay!

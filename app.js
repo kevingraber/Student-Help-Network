@@ -17,23 +17,8 @@ var exphbs  = require('express-handlebars');
 
 // Passport
 // =============================================================
-// passport.use(new LocalStrategy(
-//   function(username, password, done) {
-//     Mentor.findOne({ username: username }, function(err, user) {
-//       if (err) { return done(err); }
-//       if (!user) {
-//       	console.log('Incorrect username.')
-//         return done(null, false, { message: 'Incorrect username.' });
-//       }
-//       if (user.password != password) {
-//       	console.log('Incorrect password.')
-//         return done(null, false, { message: 'Incorrect password.' });
-//       }
-//       return done(null, user);
-//     });
-//   }
-// ));
 
+// Local strategy for mentor authentication.
 passport.use('mentor', new LocalStrategy(
   function(username, password, done) {
     Mentor.findOne({ username: username }, function(err, user) {
@@ -51,6 +36,7 @@ passport.use('mentor', new LocalStrategy(
   }
 ));
 
+// Local strategy for professor authentication.
 passport.use('professor', new LocalStrategy(
   function(username, password, done) {
     Professor.findOne({ username: username }, function(err, user) {
@@ -115,8 +101,8 @@ var app = express();
 var PORT = process.env.PORT || 8080;
 
 // Sets the connection to MongoDB
-// mongoose.connect("mongodb://localhost/Student-Help-App-DB");
-mongoose.connect('mongodb://dbadmin:rutgers0451@ds019756.mlab.com:19756/heroku_smj7vwxw');
+mongoose.connect("mongodb://localhost/Student-Help-App-DB");
+// mongoose.connect('mongodb://dbadmin:rutgers0451@ds019756.mlab.com:19756/heroku_smj7vwxw');
 
 // Use morgan to log requests to the console.
 app.use(morgan('dev'));

@@ -18,6 +18,7 @@ var MentorSchema = new Schema({
         ref: 'Student'
     }],
     approved: {type: Boolean, default: null},
+    mentorlevel: {type: Number, default: null},
     full: {type: Boolean, default: false},
     role: {type: String, default: 'mentor'},
     created_at: {type: Date, default: Date.now},

@@ -14,8 +14,8 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Mentees<span class="sr-only">(current)</span></a></li>
-        <li><a href="#">Account</a></li>
+        <li class="active"><a href="/mentor">Mentees<span class="sr-only">(current)</span></a></li>
+        <li><a href="/mentor/account">Account</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/logout">Log Out</a></li>
@@ -59,6 +59,23 @@
 		  	</div>
 		</div>
 	{{/each}}
+
+	{{#each user.mentoring}}
+		<div class="row">
+			<div class="col-md-8 col-md-offset-2 bordered">
+				{{email}}
+			</div>
+		</div>
+	{{/each}}
+
+	<style>
+		.bordered{
+			border-style: solid;
+			border-color: black;
+			border-width: 5px;
+			font-size: 24px;
+		}
+	</style>
 
 	{{!-- <p>
 		<a href="/logout">Log Out</a>

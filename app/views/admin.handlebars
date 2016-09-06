@@ -1,0 +1,114 @@
+<div class="jumbotron text-center"><h1>Admin TEST</h1></div>
+
+<div class="col-md-12">
+
+	<h2>Pending Mentors</h2>
+	{{#if pendingmentors}}
+	<table class="table table-hover">
+		<tr>
+			<th>Name</th>
+			<th>Section</th>
+			<th>Email</th>
+			<th>Approve?</th>
+		</tr>
+		{{#each pendingmentors}}
+		<tr>
+			<td>{{name}}</td>
+			<td>{{section}}</td>
+			<td>{{email}}</td>
+			<td>
+				<select id="{{id}}" name="mentorlevel">
+				  	<option value="1">1/5</option>
+				  	<option value="2">2/5</option>
+				  	<option selected value="3">3/5</option>
+				  	<option value="4">4/5</option>
+				  	<option value="5">5/5</option>
+				</select>
+				<button class="btn btn-success approveButton" onClick="approve('{{id}}')">
+					<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
+				</button>
+				<button class="btn btn-danger denyButton" onClick="deny('{{id}}')">
+					<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+				</button>
+			</td>
+		</tr>
+		{{/each}}
+	</table>
+	{{else}}
+		<h3 class="text-center">No Pending Mentors!</h3>
+	{{/if}}
+
+</div>
+
+<div class="col-md-6">
+	
+	<h2>Approved Mentors</h2>
+	<table class="table table-hover">
+		<tr>
+			<th>Name</th>
+			<th>Section</th>
+			<th>Email</th>
+		</tr>
+		{{#each approvedmentors}}
+		<tr>
+			<td>{{name}}</td>
+			<td>{{section}}</td>
+			<td>{{email}}</td>
+		</tr>
+		{{/each}}
+	</table>
+
+</div>
+
+<div class="col-md-6">
+
+	<h2>Denied Mentors</h2>
+	<table class="table table-hover">
+		<tr>
+			<th>Name</th>
+			<th>Section</th>
+			<th>Email</th>
+		</tr>
+		{{#each deniedmentors}}
+		<tr>
+			<td>{{name}}</td>
+			<td>{{section}}</td>
+			<td>{{email}}</td>
+		</tr>
+		{{/each}}
+	</table>
+
+</div>
+
+<script>
+	
+function approve(id) {
+
+	var mentorlevel = $('#' + id).val()
+	var originURL = document.location.origin;
+	$.post( originURL + "/api/approve/" + id, {mentorlevel: mentorlevel})
+	    .done(function(data){
+	      console.log(data);
+	    })
+
+}
+
+function deny(id) {
+
+	var originURL = document.location.origin;
+	$.post( originURL + "/api/deny/" + id).done(function(){
+        // alert("Preparing to send");
+    });
+
+}
+
+
+$('.denyButton').click(function() {
+	$(this).closest('tr').remove();
+});
+
+$('.approveButton').click(function() {
+	$(this).closest('tr').remove();
+});
+
+</script>

@@ -8,14 +8,14 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button> --}}
-      <a class="navbar-brand" href="#">{{user.name}}</a>
+      <a class="navbar-brand" href="/professor">{{user.name}}</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Mentors<span class="sr-only">(current)</span></a></li>
-        <li><a href="#">Account</a></li>
+        <li class="active"><a href="/professor">Mentors<span class="sr-only">(current)</span></a></li>
+        <li><a href="/professor/account">Account</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/logout">Log Out</a></li>
@@ -32,24 +32,35 @@
 	<div class="col-md-8 col-md-offset-2">
 		<h2>Pending Mentors</h2>
 		<div class="mentors">
-			{{#each pendingmentor}}
-				<div class="well">
-					<p>{{name}}</p>
-					<p>Wants to teach:</p>
-					<ul>
-					{{#each subjects}}
-						<li>{{this}}</li>
-					{{/each}}
-					</ul>
-					<p>Email: {{email}}</p>
-					<button class="btn btn-success approveButton" onClick="approve('{{id}}')">
-						<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
-					</button>
-					<button class="btn btn-danger denyButton" onClick="deny('{{id}}')">
-						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
-					</button>
-				</div>
-			{{/each}}
+			{{#if pendingmentor}}
+				{{#each pendingmentor}}
+					<div class="well">
+						<p>{{name}}</p>
+						<p>Wants to teach:</p>
+						<ul>
+						{{#each subjects}}
+							<li>{{this}}</li>
+						{{/each}}
+						</ul>
+						<p>Email: {{email}}</p>
+						<select id="{{id}}" name="mentorlevel">
+						  	<option value="1">1/5</option>
+						  	<option value="2">2/5</option>
+						  	<option selected value="3">3/5</option>
+						  	<option value="4">4/5</option>
+						  	<option value="5">5/5</option>
+						</select>
+						<button class="btn btn-success approveButton" onClick="approve('{{id}}')">
+							<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
+						</button>
+						<button class="btn btn-danger denyButton" onClick="deny('{{id}}')">
+							<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+						</button>
+					</div>
+				{{/each}}
+			{{else}}
+				<p>No pending mentors!</p>
+			{{/if}}
 		</div>
 	</div>
 </div>
@@ -57,13 +68,14 @@
 <script>
 
 function approve(id) {
+
+	var mentorlevel = $('#' + id).val()
 	var originURL = document.location.origin;
-	// alert(originURL)
-	$.post( originURL + "/api/approve/" + id)
+	$.post( originURL + "/api/approve/" + id, {mentorlevel: mentorlevel})
         .done(function(data){
           console.log(data);
-          // alert("Preparing to send")
         })
+
 }
 
 function deny(id) {

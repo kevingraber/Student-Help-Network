@@ -12,6 +12,8 @@ var _ = require('lodash');
 var nodemailer = require('nodemailer');
 var passport = require('passport');
 
+var College = require('../model/college.js');
+
 // Setting up the account that will send the emails.
 var transporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -25,6 +27,77 @@ var transporter = nodemailer.createTransport({
 // Routes
 // =============================================================
 module.exports = function(app){
+
+	// New College
+	app.post('/api/new-college', function(req, res) {
+
+		// Creates a new professor based on the Mongoose schema and the post body.
+		var newCollege = new College({
+            name: req.body.name,
+            sections: req.body.sections
+        });
+
+		// The new professor is saved in the db.
+       	newCollege.save(function(err){
+            if(err) res.send(err);
+            res.send("Thank You for signing up!");
+        });
+
+	});
+
+	app.get('/api/colleges', function(req, res) {
+
+		College.find().exec(function(err, data) {
+			if (err) res.send(err);
+			res.send(data)
+		})
+
+	})
+
+	app.get('/or-test', function(req, res) {
+		Mentor.find().or([{username: 'snape'}, {email: 'KJG310@Gmail.com'}]).exec(function(err, mentors) {
+
+			if (mentors.length != 0) {
+				res.send("VALIDATION ERROR")
+			}
+			res.send(mentors)
+		})
+	})
+
+	// Returns all matched mentors and populates them!
+	app.get('/api/matchedmentors', function(req, res) {
+		Mentor.find({}).$where('this.mentoring.length > 0').populate('mentoring').exec(function(err, mentors) {
+			if (err) res.send(err);
+			res.send(mentors);
+		});
+	});
+
+	app.get('/api/admin', function(req, res) {
+
+		console.log("REQUEST RECEIVED")
+
+		Mentor.find(function(err, mentors) {
+			if (err) res.send(err);
+
+			var approvedMentors = [];
+			var pendingMentors = [];
+			var deniedMentors = [];
+
+			for (var i = 0; i < mentors.length; i++) {
+				if (mentors[i].approved == true) {
+					approvedMentors.push(mentors[i])
+				} else if (mentors[i].approved == false) {
+					deniedMentors.push(mentors[i])
+				} else {
+					pendingMentors.push(mentors[i])
+				}
+			}
+
+			// res.send(mentors);
+			res.render('admin', {approvedmentors: approvedMentors, pendingmentors: pendingMentors, deniedmentors: deniedMentors})
+		})
+
+	})
 
 	app.get('/api/section/:id', function(req, res) {
 		Student.find({section: req.params.id}, function(err, students) {
@@ -49,21 +122,18 @@ module.exports = function(app){
 	// app.post('/login', passport.authenticate('mentor', {failureRedirect: '/login',}), function(req, res) {
 	// 	res.redirect('/api/mentors/' + req.user.id)
 	// });
-	app.post('/login', passport.authenticate('mentor', {failureRedirect: '/login',}), function(req, res) {
-		Mentor.findOne({_id: req.user.id}).populate('mentoring').exec(function(err, mentor) {
-			if (err) res.send(err);
-			res.render('mentor', {user: mentor})
-		})
-
-		// res.render('mentor', {user: req.user})
+	app.post('/login', passport.authenticate('mentor', {failureRedirect: '/',}), function(req, res) {
+		res.redirect('/mentor')
 	});
 
-	// Log in route.
-	app.post('/login-professor', passport.authenticate('professor', {failureRedirect: '/login',}), function(req, res) {
-		Mentor.find({section: req.user.section, approved: null}, function(err, students) {
-			if (err) res.send(err);
-			res.render('professor', {user: req.user, pendingmentor: students})
-		})
+	// Professor log in route.
+	app.post('/professor', passport.authenticate('professor', {failureRedirect: '/login',}), function(req, res) {
+		// Grabbing all of the pending mentors in the professors section.
+		// Mentor.find({section: req.user.section, approved: null}, function(err, students) {
+		// 	if (err) res.send(err);
+		// 	res.render('professor', {user: req.user, pendingmentor: students})
+		// })
+		res.redirect('/professor')
 	});
 
 	// Log out route.
@@ -77,20 +147,17 @@ module.exports = function(app){
 	// Approve
 	app.post('/api/approve/:mentorid', function(req, res) {
 
-		Mentor.findByIdAndUpdate(req.params.mentorid, { $set: { approved: true }}, function(err, mentor) {
+		console.log(req.body)
+		console.log(req.body.mentorlevel)
+
+		Mentor.findByIdAndUpdate(req.params.mentorid, { $set: { approved: true, mentorlevel: req.body.mentorlevel }}, function(err, mentor) {
 			if (err) handleError(err);
-			// console.log(req.user)
-			console.log(req.user.name + " has successfully approved " + mentor.name + " as a mentor!");
-			Mentor.find({section: req.user.section, approved: null}, function(err, students) {
-				if (err) res.send(err);
-				res.render('professor', {user: req.user, pendingmentor: students})
-			})
+			// Mentor.find({section: req.user.section, approved: null}, function(err, students) {
+			// 	if (err) res.send(err);
+			// 	res.render('professor', {user: req.user, pendingmentor: students})
+			// })
 		});
 
-		// console.log("worked!")
-		// Mentor.findById(req.params.mentorid, function(err, mentor) {
-		// 	console.log("You are approving " + mentor.name)
-		// })
 	})
 
 	// Deny
@@ -174,7 +241,6 @@ module.exports = function(app){
             subjects: req.body.subjects,
             availability: req.body.availability,
             additionalinfo: req.body.additionalinfo,
-
         });
 
         // New Student is saved in the db.
@@ -189,11 +255,12 @@ module.exports = function(app){
             // Search for a mentor with the same availability and atleast one subject in common.
 			Mentor
 			  .find({
-			  	approved: true, 						// Mentor must be approved by their professor.
-			  	availability: newStudent.availability, 	// Same availability.
+			  	approved: true, 							// Mentor must be approved by their professor.
+			  	availability: newStudent.availability, 		// Same availability.
 			  	subjects: {$in: newStudent.subjects}		// At least one subject in common.
 			  })
-			  .sort({mentoring: 1}) 					// Sort by lest number of mentees first.
+			  .sort({mentoring: 1}) 						// Sort by least number of mentees first.
+			  .sort({mentorlevel: -1})						// Then sort by highest mentor skill level.
 			  .exec(function(err, docs){
 
 				if (err) res.send(err);
@@ -206,13 +273,16 @@ module.exports = function(app){
 
 	          		// Updating the database with the match.
 	          		Mentor.findOneAndUpdate({'_id': docs[0]._id}, {$push:{"mentoring": newStudent._id}})
-						.exec(function(err, artdoc){
+						.exec(function(err, mentor){
 							if (err){
 								console.log(err);
 							} else {
-								console.log(artdoc);
+								console.log(mentor);
 								Student.findByIdAndUpdate(newStudent._id, { $set: { matched: true }}, function (err, student) {
 								  	if (err) return handleError(err);
+								  	// Send the student an email with their new mentor.
+								  	EmailStudent(student, mentor)
+								  	EmailMentor(student, mentor)
 								});
 							}
 						});
@@ -226,6 +296,7 @@ module.exports = function(app){
 	          			availability: newStudent.availability
 	          		})
 	          		.sort({mentoring: 1})
+	          		.sort({mentorlevel: -1})
 	          		.exec(function(err, mentdocs) {
 
 	          			if (err) res.send(err);
@@ -238,13 +309,15 @@ module.exports = function(app){
 
 	          				// Updating the database with the match.
 			          		Mentor.findOneAndUpdate({'_id': mentdocs[0]._id}, {$push:{"mentoring": newStudent._id}})
-								.exec(function(err, artdoc){
+								.exec(function(err, mentor){
 									if (err){
 										console.log(err);
 									} else {
-										console.log(artdoc);
+										console.log(mentor);
 										Student.findByIdAndUpdate(newStudent._id, { $set: { matched: true }}, function (err, student) {
 										  	if (err) return handleError(err);
+										  	EmailStudent(student, mentor)
+										  	EmailMentor(student, mentor)
 										});
 									}
 								});
@@ -260,6 +333,7 @@ module.exports = function(app){
 	          					subjects: {$in: newStudent.subjects}
 	          				})
 	          				.sort({mentoring: 1})
+	          				.sort({mentorlevel: -1})
 	          				.exec(function(err, desperatedocs) {
 
 	          					if (err) res.send(err);
@@ -272,13 +346,15 @@ module.exports = function(app){
 
 	          						// Updating the database with the match.
 					          		Mentor.findOneAndUpdate({'_id': desperatedocs[0]._id}, {$push:{"mentoring": newStudent._id}})
-										.exec(function(err, artdoc){
+										.exec(function(err, mentor){
 											if (err){
 												console.log(err);
 											} else {
-												console.log(artdoc);
+												console.log(mentor);
 												Student.findByIdAndUpdate(newStudent._id, { $set: { matched: true }}, function (err, student) {
 												  	if (err) return handleError(err);
+												  	EmailStudent(student, mentor)
+												  	EmailMentor(student, mentor)
 												});
 											}
 										});
@@ -293,6 +369,7 @@ module.exports = function(app){
 	          							approved: true
 	          						})
 	          						.sort({mentoring: 1})
+	          						.sort({mentorlevel: -1})
 	          						.exec(function(err, destitutedocs) {
 
 	          							if (err) res.send(err);
@@ -301,13 +378,15 @@ module.exports = function(app){
 
 	          							// Updating the database with the match.
 						          		Mentor.findOneAndUpdate({'_id': destitutedocs[0]._id}, {$push:{"mentoring": newStudent._id}})
-											.exec(function(err, artdoc){
+											.exec(function(err, mentor){
 												if (err){
 													console.log(err);
 												} else {
-													console.log(artdoc);
+													console.log(mentor);
 													Student.findByIdAndUpdate(newStudent._id, { $set: { matched: true }}, function (err, student) {
 													  	if (err) return handleError(err);
+													  	EmailStudent(student, mentor)
+													  	EmailMentor(student, mentor)
 													});
 												}
 											});
@@ -437,7 +516,10 @@ module.exports = function(app){
 
         // The new mentor is saved in the db.
        	newMentor.save(function(err){
-            if(err) res.send(err);
+
+       		// Mentor.find({email: newMentor})
+
+            if (err) res.send(err);
             res.send("Thank You for signing up!")
 
             // Finding the professor of the mentor and sending them an email.
@@ -445,6 +527,9 @@ module.exports = function(app){
             	if (err) throw err;
             	console.log(prof);
             	console.log("You are in section: " + newMentor.section + ". Your Professor is " + prof.name + ". His email is " + prof.email + ".");
+
+            		// Here we send an email to the mentor thanking them for signing up.
+            		EmailMentorSignup(newMentor);
 
             			// Email options.
 						var mailOptions = {
@@ -485,93 +570,103 @@ module.exports = function(app){
 		// console.log(req.body);
 		console.log(req.body.subjects)
 		console.log(req.body.availability)
-		console.log(req.body.approved)
 
 		// Search for a mentor with the same availability and atleast one subject in common.
 		Mentor
 		  .find({
-		  	approved: true, 						// Mentor must be approved by their professor.
-		  	availability: req.body.availability, 	// Same availability.
+		  	approved: true, 							// Mentor must be approved by their professor.
+		  	availability: req.body.availability, 		// Same availability.
 		  	subjects: {$in: req.body.subjects}		// At least one subject in common.
 		  })
-		  .sort({mentoring: 1}) 					// Sort by lest number of mentees first.
+		  .sort({mentoring: 1}) 						// Sort by least number of mentees first.
+		  .sort({mentorlevel: -1})						// Then sort by highest mentor skill level.
 		  .exec(function(err, docs){
 
-				if (err) res.send(err);
+			if (err) res.send(err);
 
-				// If we get results...
-	          	if (docs.length != 0) {
+			// If we get results...
+          	if (docs.length != 0) {
 
-	          		res.send(docs)
-	          		console.log("You have been matched with " + docs[0])
+          		res.send(docs)
+          		console.log("You have a great match! You have been matched with " + docs[0])
+          		EmailStudent(req.body, docs[0])
 
-	          	// If a match can't be found with availability & subjects...
-	          	} else {
+          	// If a match can't be found with availability & subjects...
+          	} else {
 
-	          		// We will look for someone with just the same availability.
-	          		Mentor.find({
-	          			approved: true,
-	          			availability: req.body.availability
-	          		})
-	          		.sort({mentoring: 1})
-	          		.exec(function(err, mentdocs) {
+          		// We will look for someone with just the same availability.
+          		Mentor.find({
+          			approved: true,
+          			availability: req.body.availability
+          		})
+          		.sort({mentoring: 1})
+          		.sort({mentorlevel: -1})
+          		.exec(function(err, mentdocs) {
 
-	          			if (err) res.send(err);
+          			if (err) res.send(err);
 
-	          			// If we get results...
-	          			if (mentdocs.length != 0) {
+          			// If we get results...
+          			if (mentdocs.length != 0) {
 
-	          				res.send(mentdocs)
-	          				console.log("You have been matched with " + mentdocs[0].name)
+          				res.send(mentdocs)
+          				console.log("You have been matched with " + mentdocs[0].name)
+          				EmailStudent(req.body, mentdocs[0])
 
-	          			// If a match can't be found with the same availability...
-	          			} else {
+          			// If a match can't be found with the same availability...
+          			} else {
 
-	          				console.log("REALLY? NO ONE?!")
+          				console.log("REALLY? NO ONE?!")
 
-	          				// We will look for a mentor that shares a subject.
-	          				Mentor.find({
-	          					approved: true,
-	          					subjects: {$in: req.body.subjects}
-	          				})
-	          				.sort({mentoring: 1})
-	          				.exec(function(err, desperatedocs) {
+          				// We will look for a mentor that shares a subject.
+          				Mentor.find({
+          					approved: true,
+          					subjects: {$in: req.body.subjects}
+          				})
+          				.sort({mentoring: 1})
+          				.sort({mentorlevel: -1})
+          				.exec(function(err, desperatedocs) {
 
-	          					if (err) res.send(err);
+          					if (err) res.send(err);
 
-	          					// If we get results...
-	          					if (desperatedocs != 0) {
+          					// If we get results...
+          					if (desperatedocs != 0) {
 
-	          						res.send(desperatedocs)
-	          						console.log("You have been matched with " + desperatedocs[0].name)
+          						res.send(desperatedocs)
+          						console.log("You have been matched with " + desperatedocs[0].name)
+          						EmailStudent(req.body, desperatedocs[0])
 
-	          					// If a match can't be found...
-	          					} else {
 
-	          						console.log("...really?")
+          					// If a match can't be found...
+          					} else {
 
-	          						// We just grab the first mentor we can!
-	          						Mentor.find({
-	          							approved: true
-	          						})
-	          						.sort({mentoring: 1})
-	          						.exec(function(err, destitutedocs) {
-	          							if (err) res.send(err);
-	          							res.send(destitutedocs);
-	          							console.log("You have been matched with " + destitutedocs[0].name + ". May god have mercy on your soul.")
-	          						})
+          						console.log("...really?")
 
-	          					}
+          						// We just grab the first mentor we can!
+          						Mentor.find({
+          							approved: true
+          						})
+          						.sort({mentoring: 1})
+          						.sort({mentorlevel: -1})
+          						.exec(function(err, destitutedocs) {
 
-	          				})
+          							if (err) res.send(err);
+          							res.send(destitutedocs);
+          							console.log("You have been matched with " + destitutedocs[0].name + ". May god have mercy on your soul.")
+          							EmailStudent(req.body, destitutedocs[0])
 
-	          			}
+          						})
 
-	          		})
+          					}
 
-	          	}
-		          	
-			});
+          				})
+
+          			}
+
+          		})
+
+          	}
+	          	
+		});
 
 	});
 
@@ -679,5 +774,70 @@ module.exports = function(app){
 		});
 
 	})
+
+	function EmailStudent(student, mentor) {
+
+		// Configuring the email.
+		var mailOptions = {
+		    from: '"Student Help Network" <shn.noreply@gmail.com>', 	// Sender address.	
+		    to: student.email,											// List of recipients.
+		    subject: 'Your new coding mentor!', 						// Subject line.
+		    html: '<p>Congratulations ' + student.name + ', we have found a coding mentor for you!</p> <p>Your mentor is ' + mentor.name + ', and their email address is ' + mentor.email + '!</p>'// html body
+		};
+
+		// Send mail with defined transport object.
+		transporter.sendMail(mailOptions, function(error, info){
+		    if(error){
+		        return console.log(error);
+		    }
+		    console.log('Message sent: ' + info.response);
+		    // res.send("Email sent successfully!")
+		});
+
+	}
+
+	// Function for sending student an email upon getting matched with a mentor.
+	function EmailMentor(student, mentor) {
+
+		// Configuring the email.
+		var mailOptions = {
+		    from: '"Student Help Network" <shn.noreply@gmail.com>', 	// Sender address.	
+		    to: mentor.email,											// List of recipients.
+		    subject: 'Your have a new mentee!', 						// Subject line.
+		    html: '<p>Congratulations ' + mentor.name + ', we have found a new student for you to mentor!!</p> <p>Your mentee is ' + student.name + ', and their email address is ' + student.email + '!</p>'// html body
+		};
+
+		// Send mail with defined transport object.
+		transporter.sendMail(mailOptions, function(error, info){
+		    if(error){
+		        return console.log(error);
+		    }
+		    console.log('Message sent: ' + info.response);
+		    // res.send("Email sent successfully!")
+		});
+
+	}
+
+	// Function for sending student an email to a mentor that just signed up.
+	function EmailMentorSignup(mentor) {
+
+		// Configuring the email.
+		var mailOptions = {
+		    from: '"Student Help Network" <shn.noreply@gmail.com>', 	// Sender address.	
+		    to: mentor.email,											// List of recipients.
+		    subject: 'Thank you for signing up!', 						// Subject line.
+		    html: '<p>Dear ' + mentor.name + ' thank you for signing up to be a mentor! Your username is: ' + mentor.username + '. We will notify you when you receive a match!</p>'// html body
+		};
+
+		// Send mail with defined transport object.
+		transporter.sendMail(mailOptions, function(error, info){
+		    if(error){
+		        return console.log(error);
+		    }
+		    console.log('Message sent: ' + info.response);
+		    // res.send("Email sent successfully!")
+		});
+
+	}
 
 }

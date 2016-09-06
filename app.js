@@ -101,8 +101,8 @@ var app = express();
 var PORT = process.env.PORT || 8080;
 
 // Sets the connection to MongoDB
-mongoose.connect("mongodb://localhost/Student-Help-App-DB");
-// mongoose.connect('mongodb://dbadmin:rutgers0451@ds019756.mlab.com:19756/heroku_smj7vwxw');
+// mongoose.connect("mongodb://localhost/Student-Help-App-DB");
+mongoose.connect('mongodb://dbadmin:rutgers0451@ds019756.mlab.com:19756/heroku_smj7vwxw');
 
 // Use morgan to log requests to the console.
 app.use(morgan('dev'));

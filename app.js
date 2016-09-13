@@ -13,6 +13,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var Mentor = require('./app/model/mentor.js');
 var Professor = require('./app/model/professor.js');
+var Admin = require('./app/model/admin.js');
 var exphbs  = require('express-handlebars');
 
 // Passport

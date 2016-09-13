@@ -1,67 +1,171 @@
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-{{!--       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button> --}}
-      <a class="navbar-brand" href="#">{{user.name}}</a>
-    </div>
 
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="/mentor">Mentees<span class="sr-only">(current)</span></a></li>
-        <li><a href="/mentor/account">Account</a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="/logout">Log Out</a></li>
-      </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
+<!-- Navbar -->
+<nav class="navbar navbar-default">
+  	<div class="container-fluid">
+   		<!-- Brand and toggle get grouped for better mobile display -->
+    	<div class="navbar-header">
+      		<a class="navbar-brand" href="#">{{user.name}}</a>
+    	</div>
+
+	    <!-- Collect the nav links, forms, and other content for toggling -->
+	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+	      	<ul class="nav navbar-nav">
+	        	<li class="active"><a href="/mentor">Mentees<span class="sr-only">(current)</span></a></li>
+	        	<li><a href="/mentor/account">Account</a></li>
+	      	</ul>
+	      	<ul class="nav navbar-nav navbar-right">
+	        	<li><a href="/logout">Log Out</a></li>
+	      	</ul>
+	    </div><!-- /.navbar-collapse -->
+  	</div><!-- /.container-fluid -->
 </nav>
 
-<div class="jumbotron">
-	<h1 class="text-center"> Welcome {{ user.name }} </h1>
-</div>
+{{!-- <div class="jumbotron"> --}}
+	{{!-- <h1 class="text-center"> Welcome {{ user.name }} </h1> --}}
+{{!-- </div> --}}
 
-	<div class="row">
-		<div class="col-md-8 offset-2">
-			<h2>My Info</h2>
-			<p>Email: {{user.email}}</p>
-			<p>Offering Students Help With:</p>
-			<ul>
-				{{#each user.subjects}}
-				<li>{{this}}</li>
-				{{/each}}
-			</ul>
-			{{!-- <p>Willing to mentor: {{user.numCanMentor}}</p> --}}
-			<p>Availability: {{user.availability}}</p>
-		</div>
-	</div>
+	<div class="container">
 
-	<h2>Mentor Information</h2>
-	<h4>You are currently mentoring...</h4>
+	{{!-- <div class="col-md-8 col-md-offset-2"> --}}
+	<div class="col-sm-12">
+
+
+	<h2 class='headline'>Current Mentee Information</h2>
+	<h4>You are currently mentoring {{user.mentoring.length}} student(s):</h4>
 
 	{{#each user.mentoring}}
 		<div class="panel panel-default">
-		  	<div class="panel-heading">
-		    	<h3 class="panel-title">{{name}}</h3>
-		  	</div>
-		  	<div class="panel-body">
-		   		<p>Email: {{email}}<p>
+		  		<h3>{{name}}</h3>
+		   		<p>Email: {{email}}</p>
 		   		<p>Availability: {{availability}}</p>
 				<p>Comfort Level: {{comfortLevel}}</p>
 				<p>Additional Info: {{additionalinfo}}</p>
-		  	</div>
+				<p>Looking for help with:</p>
+				<ul>
+				{{#each subjects}}
+				<li>{{this}}</li>
+				{{/each}}
+				</ul>
 		</div>
+
+		{{#unless @last}}
+		<hr>
+		{{/unless}}
+		
 	{{/each}}
 
+{{!-- 	{{#each user.mentoring}}
+		<div class="mentee">
+		  		<h3>{{name}}</h3>
+		   		<p>Email: {{email}}</p>
+		   		<p>Availability: {{availability}}</p>
+				<p>Comfort Level: {{comfortLevel}}</p>
+				<p>Looking for help with:</p>
+				<ul class="list-group">
+				{{#each subjects}}
+				<li class="list-group-item">{{this}}</li>
+				{{/each}}
+				</ul>
+				<p>Additional Info: {{additionalinfo}}</p>
+		</div>
+		
+		{{#unless @last}}
+		<hr>
+		{{/unless}}
+		
+	{{/each}} --}}
 
+	</div>
 
-	{{!-- <p>
-		<a href="/logout">Log Out</a>
-	</p> --}}
+	</div>
+
+	<style>
+
+	.navbar-default {
+        background-color: #2c3e50;
+        border-width: 0px;
+        border-color: #2c3e50;
+        border-radius: 0px;
+    }
+
+    .navbar-default .navbar-brand {
+        color:white;
+        font-weight: 800;
+        font-size: 24px;
+    }
+
+    .navbar-default .navbar-nav > li > a {
+        color:white;
+    }
+
+    .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+        background-color: #577797;
+        color:white;
+    }
+
+	/*#fcfdfd offwhite*/
+	/*#ffffff white*/
+
+	.panel {
+		padding:20px;
+	}
+
+	.headline {
+		font-size: 50px;
+		font-weight: 800;
+		margin-top: 50px;
+		margin-bottom: 50px;
+	}
+
+	.mentee {
+		/*border-left: 10px solid #EF6;*/
+		/*padding-left:3px;*/
+		border: 1px solid gray;
+		padding: 10px;
+		/*background-color: #dbffaa;*/
+		/*background-color: #0ca3b9;*/
+		/*padding: 10px;*/
+		/*border-radius: 5px*/
+		/*box-shadow: 1px 1px 1px gray;*/
+	}
+
+	.mentee p {
+		/*color: #d9eef2;*/
+	}
+
+	.form-input {
+	  background: #fafafa;
+	  border: 1px solid #bfbfbf;
+	  border-radius: 2px;
+	  padding: 12px 16px;
+	  min-width: 25%;
+	}
+
+	.btn-test {
+		border-radius: 0.2rem;
+	}
+
+	h2, a, button, input, p, h1, h3, li, h2, h4 {
+		font-family: 'Raleway', sans-serif;
+		color: #2c3e50;
+	}
+
+	p {
+		font-size: 15px;
+	}
+
+	h1 {
+		font-family: 'Raleway', sans-serif;
+		font-weight: 700;
+		color: #2c3e50;
+	}
+
+	body {
+		/*background-color: #e9ebee;*/
+	}
+
+	hr {
+		/*border-top: 6px solid #EE0;*/
+	}
+
+</style>

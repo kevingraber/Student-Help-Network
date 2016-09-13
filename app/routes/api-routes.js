@@ -8,6 +8,7 @@ var mongoose = require('mongoose');
 var Student = require('../model/student.js');
 var Mentor = require('../model/mentor.js');
 var Professor = require('../model/professor.js');
+var Admin = require('../model/admin.js');
 var _ = require('lodash');
 var nodemailer = require('nodemailer');
 var passport = require('passport');
@@ -25,6 +26,38 @@ var transporter = nodemailer.createTransport({
 // Routes
 // =============================================================
 module.exports = function(app){
+
+	app.post('/new-admin', function(req, res) {
+
+		console.log(req.body);
+
+		// Creates a new admin based on the Mongoose schema and the post body.
+        var newAdmin = new Admin({
+            name: req.body.name,
+            email: req.body.email,
+            username: req.body.username,
+            password: req.body.password,
+        });
+
+        // The new admin is saved in the db.
+       	newAdmin.save(function(err, admin){
+
+            if (err) res.send(err);
+            console.log(admin)
+            res.send("Thank You for signing up!")
+           
+		});
+
+	});
+
+	app.post('/mentor/update', function(req, res) {
+		console.log(req.body)
+		Mentor.findByIdAndUpdate(req.user.id, { $set: { email: req.body.email, availability: req.body.availability, subjects: req.body.subjects } }, function(err, mentor) {
+			console.log(mentor);
+			res.redirect('/mentor/account');
+		})
+		// console.log(req.body);
+	});
 
 	app.get('/api/colleges', function(req, res) {
 

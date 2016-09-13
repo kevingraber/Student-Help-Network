@@ -6,9 +6,10 @@
 	{{#if pendingmentors}}
 	<table class="table table-hover">
 		<tr>
-			<th>Name</th>
+			<th >Name</th>
 			<th>Section</th>
 			<th>Email</th>
+			<th>Skill Level</th>
 			<th>Approve?</th>
 		</tr>
 		{{#each pendingmentors}}
@@ -17,18 +18,20 @@
 			<td>{{section}}</td>
 			<td>{{email}}</td>
 			<td>
-				<select id="{{id}}" name="mentorlevel">
+				<select class="form-input" id="{{id}}" name="mentorlevel">
 				  	<option value="1">1/5</option>
 				  	<option value="2">2/5</option>
 				  	<option selected value="3">3/5</option>
 				  	<option value="4">4/5</option>
 				  	<option value="5">5/5</option>
 				</select>
-				<button class="btn btn-success approveButton" onClick="approve('{{id}}')">
-					<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
+			</td>
+			<td>
+				<button class="btn btn-success approveButton btn-circle btn-lg" onClick="approve('{{id}}')">
+					<span class="fa fa-check fa-2x" aria-hidden="true"></span>
 				</button>
-				<button class="btn btn-danger denyButton" onClick="deny('{{id}}')">
-					<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+				<button class="btn btn-danger denyButton btn-circle btn-lg" onClick="deny('{{id}}')">
+					<span class="fa fa-times fa-2x" aria-hidden="true"></span>
 				</button>
 			</td>
 		</tr>
@@ -79,6 +82,100 @@
 	</table>
 
 </div>
+
+<style>
+
+    /*#fcfdfd offwhite*/
+    /*#ffffff white*/
+
+    .mentee {
+        /*border-left: 10px solid #EF6;*/
+        /*padding-left:3px;*/
+        border: 1px solid gray;
+        padding: 10px;
+        /*background-color: #dbffaa;*/
+        /*background-color: #0ca3b9;*/
+        /*padding: 10px;*/
+        /*border-radius: 5px*/
+        /*box-shadow: 1px 1px 1px gray;*/
+    }
+
+    .mentee p {
+        /*color: #d9eef2;*/
+    }
+
+    .form-input {
+      background: #fafafa;
+      border: 1px solid #bfbfbf;
+      border-radius: 2px;
+      padding: 12px 16px;
+      min-width: 25%;
+    }
+
+    .btn-test {
+        border-radius: 0.2rem;
+    }
+
+    h2, a, button, input, p, h1, h3, li, h2 {
+        font-family: 'Raleway', sans-serif;
+    }
+
+    body {
+        /*background-color: #e9ebee;*/
+    }
+
+    hr {
+        /*border-top: 6px solid #EE0;*/
+    }
+
+    .form-input {
+      background: #fafafa;
+      border: 1px solid #bfbfbf;
+      border-radius: 2px;
+      padding: 12px 16px;
+      min-width: 25%;
+    }
+
+    .btn-test {
+        border-radius: 0.2rem;
+    }
+
+    h2, a, button, input, p, h1, label, option, select, h4, h3, table {
+        font-family: 'Raleway', sans-serif;
+    }
+
+    .noleftpadding {
+        padding-left: 0px;
+    }
+
+    .norightpadding {
+        padding-right: 0px;
+    }
+
+    .bottom-button {
+        margin-bottom: 30px;
+    }
+
+    .btn-circle {
+		  width: 30px;
+		  height: 30px;
+		  text-align: center;
+		  padding: 6px 0;
+		  font-size: 12px;
+		  line-height: 1.428571429;
+		  border-radius: 15px;
+	}
+
+	.btn-circle.btn-lg {
+	  	width: 50px;
+	  	height: 50px;
+	  	/*padding: 10px 16px;*/
+	  	font-size: 18px;
+	  	line-height: 1.33;
+	  	border-radius: 2px;
+	}
+
+</style>
 
 <script>
 	

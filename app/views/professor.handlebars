@@ -1,13 +1,14 @@
+
+{{!-- Navbar --}}
 <nav class="navbar navbar-default">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
-{{!--       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
-      </button> --}}
+      </button>
       <a class="navbar-brand" href="/professor">{{user.name}}</a>
     </div>
 
@@ -24,38 +25,53 @@
   </div><!-- /.container-fluid -->
 </nav>
 
-<div class="jumbotron">
-	<h1 class="text-center"> Welcome {{ user.name }} </h1>
-</div>
+<div class="container">
+
+{{!-- <div class="jumbotron"> --}}
+	<h1 class="text-center headline"> Welcome {{ user.name }} </h1>
+	<hr class="tiny">
+{{!-- </div> --}}
+
+{{!-- <div class="row">
+	<div class="col-sm-4"><h1>{{pendingmentors.length}}</h1></div>
+	<div class="col-sm-4"><h1>{{currentmentors.length}}</h1></div>
+</div> --}}
 
 <div class="row">
-	<div class="col-md-8 col-md-offset-2">
-		<h2>Pending Mentors</h2>
+	<div class="col-sm-12">
+		<h2>Mentors pending approval</h2>
 		<div class="mentors">
-			{{#if pendingmentor}}
-				{{#each pendingmentor}}
+			{{#if pendingmentors}}
+				{{#each pendingmentors}}
 					<div class="well">
 						<p>{{name}}</p>
-						<p>Wants to teach:</p>
+						<p>Proficient with:</p>
 						<ul>
 						{{#each subjects}}
 							<li>{{this}}</li>
 						{{/each}}
 						</ul>
 						<p>Email: {{email}}</p>
-						<select id="{{id}}" name="mentorlevel">
+
+						<div class="text-center">
+						<select class="form-input" id="{{id}}" name="mentorlevel">
 						  	<option value="1">1/5</option>
 						  	<option value="2">2/5</option>
 						  	<option selected value="3">3/5</option>
 						  	<option value="4">4/5</option>
 						  	<option value="5">5/5</option>
 						</select>
-						<button class="btn btn-success approveButton" onClick="approve('{{id}}')">
+						{{!-- <button class="btn btn-success approveButton" onClick="approve('{{id}}')">
 							<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
+						</button> --}}
+						<button class="btn btn-success approveButton btn-circle btn-lg" onClick="approve('{{id}}')">
+							<span class="fa fa-check fa-2x" aria-hidden="true"></span>
 						</button>
-						<button class="btn btn-danger denyButton" onClick="deny('{{id}}')">
-							<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+						<button class="btn btn-danger denyButton btn-circle btn-lg" onClick="deny('{{id}}')">
+							<span class="fa fa-times fa-2x" aria-hidden="true"></span>
 						</button>
+						</div>
+
 					</div>
 				{{/each}}
 			{{else}}
@@ -66,7 +82,7 @@
 </div>
 
 <div class="row">
-	<div class="col-md-8 col-md-offset-2">
+	<div class="col-sm-12">
 		<h2>Current Mentors</h2>
 		<div class="mentors">
 			{{#if currentmentors}}
@@ -92,6 +108,90 @@
 		</div>
 	</div>
 </div>
+
+</div>
+
+	<style>
+
+	.tiny {
+        border-color: #2c3e50;
+        border-top-width:5px;
+        margin-left:auto;
+        margin-right:auto;
+        width:200px;
+        margin-bottom: 75px;
+    }
+
+	.headline {
+		font-size: 50px;
+		font-weight: 800;
+		margin-top: 50px;
+		margin-bottom: 50px;
+	}
+
+	/*#fcfdfd offwhite*/
+	/*#ffffff white*/
+
+	.mentee {
+		/*border-left: 10px solid #EF6;*/
+		/*padding-left:3px;*/
+		border: 1px solid gray;
+		padding: 10px;
+		/*background-color: #dbffaa;*/
+		/*background-color: #0ca3b9;*/
+		/*padding: 10px;*/
+		/*border-radius: 5px*/
+		/*box-shadow: 1px 1px 1px gray;*/
+	}
+
+	.mentee p {
+		/*color: #d9eef2;*/
+	}
+
+	.form-input {
+	  background: #fafafa;
+	  border: 1px solid #bfbfbf;
+	  border-radius: 2px;
+	  padding: 12px 16px;
+	  min-width: 25%;
+	}
+
+	.btn-test {
+		border-radius: 0.2rem;
+	}
+
+	h2, a, button, input, p, h1, h3, li, h2 {
+		font-family: 'Raleway', sans-serif;
+	}
+
+	body {
+		/*background-color: #e9ebee;*/
+	}
+
+	hr {
+		/*border-top: 6px solid #EE0;*/
+	}
+
+	.btn-circle {
+		  width: 30px;
+		  height: 30px;
+		  text-align: center;
+		  padding: 6px 0;
+		  font-size: 12px;
+		  line-height: 1.428571429;
+		  border-radius: 15px;
+	}
+
+	.btn-circle.btn-lg {
+	  	width: 50px;
+	  	height: 50px;
+	  	/*padding: 10px 16px;*/
+	  	font-size: 18px;
+	  	line-height: 1.33;
+	  	border-radius: 2px;
+	}
+
+</style>
 
 <script>
 

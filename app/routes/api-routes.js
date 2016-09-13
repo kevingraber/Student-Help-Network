@@ -27,6 +27,26 @@ var transporter = nodemailer.createTransport({
 // =============================================================
 module.exports = function(app){
 
+	app.post('/admin/update', function(req, res) {
+		console.log(req.body)
+		Admin.findByIdAndUpdate(req.user.id, { $set: { email: req.body.email } }, function(err, admin) {
+			console.log(admin);
+			res.redirect('/admin/account');
+		})
+	});
+
+	app.post('/professor/update', function(req, res) {
+		console.log(req.body)
+		Professor.findByIdAndUpdate(req.user.id, { $set: { email: req.body.email } }, function(err, professor) {
+			console.log(professor);
+			res.redirect('/professor/account');
+		})
+	});
+
+	app.post('/admin-login', passport.authenticate('admin', {failureRedirect: '/',}), function(req, res) {
+		res.redirect('/admin')
+	})
+
 	app.post('/new-admin', function(req, res) {
 
 		console.log(req.body);

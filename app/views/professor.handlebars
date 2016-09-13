@@ -43,8 +43,8 @@
 		<div class="mentors">
 			{{#if pendingmentors}}
 				{{#each pendingmentors}}
-					<div class="well">
-						<p>{{name}}</p>
+					<div class="panel panel-default">
+						<h3>{{name}}</h3>
 						<p>Proficient with:</p>
 						<ul>
 						{{#each subjects}}
@@ -87,8 +87,8 @@
 		<div class="mentors">
 			{{#if currentmentors}}
 				{{#each currentmentors}}
-					<div class="well">
-						<p>{{name}}</p>
+					<div class="panel panel-default">
+						<h3>{{name}}</h3>
 						<p>is currently mentoring:</p>
 						{{#if mentoring}}
 							<ul>
@@ -113,6 +113,10 @@
 
 	<style>
 
+	.panel {
+		padding:0px 20px 20px 20px;
+	}
+
 	.tiny {
         border-color: #2c3e50;
         border-top-width:5px;
@@ -128,9 +132,6 @@
 		margin-top: 50px;
 		margin-bottom: 50px;
 	}
-
-	/*#fcfdfd offwhite*/
-	/*#ffffff white*/
 
 	.mentee {
 		/*border-left: 10px solid #EF6;*/
@@ -163,6 +164,18 @@
 	h2, a, button, input, p, h1, h3, li, h2 {
 		font-family: 'Raleway', sans-serif;
 	}
+
+	h2 {
+		font-weight: 600;
+	}
+
+	p {
+        font-size: 18px;
+    }
+
+    li {
+        font-size: 16px;
+    }
 
 	body {
 		/*background-color: #e9ebee;*/

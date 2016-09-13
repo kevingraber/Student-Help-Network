@@ -31,7 +31,6 @@
             <p>Name: {{user.name}}</p>
             <p>Username: {{user.username}}</p>
             <p>Email: {{user.email}}</p>
-            <p>Section: {{user.section}}</p>
             <div class="row">
                 <div class="col-sm-6 col-sm-offset-3">
                     <a class="btn btn-block btn-lg edit-button" data-toggle="modal" data-target="#myModal">Edit</a>
@@ -50,7 +49,7 @@
       </div>
       <div class="modal-body">
 
-      <form action="/professor/update" method="POST">
+      <form action="/admin/update" method="POST">
 
         <div class="form-group">
             <h3>Email:</h3>

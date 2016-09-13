@@ -55,6 +55,24 @@ passport.use('professor', new LocalStrategy(
   }
 ));
 
+// Local strategy for admin authentication.
+passport.use('admin', new LocalStrategy(
+  function(username, password, done) {
+    Admin.findOne({ username: username }, function(err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        console.log('Incorrect username.')
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (user.password != password) {
+        console.log('Incorrect password.')
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user);
+    });
+  }
+));
+
 // Attaches the id of the user to our session.
 passport.serializeUser(function(user, done) {
   console.log(user)
@@ -66,6 +84,8 @@ passport.serializeUser(function(user, done) {
       userType = "mentor";
     } else if (user.role == "professor") {
       userType = "professor";
+    } else if (user.role == "admin") {
+      userType = "admin";
     } else {
       console.log("There is a problem in the serialization")
     }
@@ -87,6 +107,10 @@ passport.deserializeUser(function(id, done) {
     });
   } else if (id.userType == "mentor") {
     Mentor.findById(id.id, function(err, user) {
+      done(err, user);
+    });
+  } else if (id.userType == "admin") {
+    Admin.findById(id.id, function(err, user) {
       done(err, user);
     });
   } else {

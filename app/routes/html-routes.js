@@ -92,7 +92,7 @@ module.exports = function(app){
 	// Admin Routes.
 	// =========================================================
 
-	app.get('/admin', function(req, res){
+	app.get('/admin', isAuthenticatedAdmin, function(req, res){
 
 		Mentor.find(function(err, mentors) {
 			if (err) res.send(err);
@@ -112,9 +112,14 @@ module.exports = function(app){
 			}
 
 			// res.send(mentors);
-			res.render('admin', {approvedmentors: approvedMentors, pendingmentors: pendingMentors, deniedmentors: deniedMentors})
+			res.render('admin', {user: req.user, approvedmentors: approvedMentors, pendingmentors: pendingMentors, deniedmentors: deniedMentors})
 		})
 
+	});
+
+	// Professor account info page.
+	app.get('/admin/account', isAuthenticatedAdmin, function(req, res) {
+		res.render('admin-account', {user: req.user})
 	});
 
 	// Functions! Yay!
@@ -132,6 +137,15 @@ module.exports = function(app){
 	// Checks to see if the user is a successfully authenticated professor.
 	function isAuthenticatedProfessor(req, res, next) {
 		if (!req.user || req.user.role != 'professor') {
+			res.redirect('/')
+		} else {
+			return next()
+		};
+	};
+
+	// Checks to see if the user is a successfully authenticated admin.
+	function isAuthenticatedAdmin(req, res, next) {
+		if (!req.user || req.user.role != 'admin') {
 			res.redirect('/')
 		} else {
 			return next()
